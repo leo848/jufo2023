@@ -6,7 +6,7 @@ from more_itertools import flatten
 
 from board_code import board_to_input, move_to_output
 
-DB_FILE = "database.pgn"
+from filenames import PGN_DATABASE
 
 def is_valid_game(game) -> bool:
     try:
@@ -35,7 +35,7 @@ def load(n: int) -> np.ndarray:
                 print(f"Processed {index} / {n} boards")
             yield value
 
-    file = open(DB_FILE)
+    file = open(PGN_DATABASE)
     games = map(lambda _: chess.pgn.read_game(file), count())
     games = filter(is_valid_game, games)
     boards = flatten(map(game_to_boards, games))

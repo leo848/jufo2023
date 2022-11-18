@@ -9,9 +9,9 @@ import os.path
 
 import training
 
-MODEL_FILE = "model.h5"
+from filenames import MODEL_NAME
 
-if os.path.isfile(MODEL_FILE):
+if os.path.isfile(MODEL_NAME):
     exit(1)
 
 # Load the data
@@ -40,4 +40,4 @@ plt.legend()
 plt.show()
 
 # Save the model
-model.save(MODEL_FILE)
+model.save(MODEL_NAME)
