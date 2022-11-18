@@ -2,4 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+*.h5
+*.ipynb_checkpoints
+*.log
+*.npz
