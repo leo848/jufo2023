@@ -5,7 +5,7 @@ import chess.pgn
 import os.path
 
 from board_code import *
-from training import *
+from pgn_to_input import *
 
 AMOUNT_OF_GAMES = 100
 

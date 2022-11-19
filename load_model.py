@@ -9,23 +9,30 @@ from abstraction import board_to_move
 
 from board_code import board_to_input, move_to_output
 
-if not os.path.isfile("model.h5"):
+from filenames import MODEL_NAME
+
+if not os.path.isfile(MODEL_NAME):
     exit(1)
 
 # Load the model
-model = models.load_model("model.h5")
+model = models.load_model(MODEL_NAME)
 
 print("\n"*50)
-i = "input"
-while i.strip() != "":
-    i = input("Enter a board: ")
-    if i == "exit":
-        break
-    try:
-        board = chess.Board(i)
-    except Exception:
-        print("Invalid board")
-        continue
+board = chess.Board()
+while not board.is_game_over():
     print(board.unicode().replace("⭘", " "))
-    print(f"Computer plays: {board_to_move(model, board)}")
-    print()
+    print("\n"*3)
+    move = input("Move: ")
+    if not move.strip():
+        move = board_to_move(model, board)
+        if board.is_legal(move):
+            print("Computer move:", move)
+            board.push(move)
+        else:
+            print("Computer move:", move, "is illegal")
+    else:
+        try:
+            board.push_uci(move)
+        except ValueError:
+            print("Illegal move:", move)
+

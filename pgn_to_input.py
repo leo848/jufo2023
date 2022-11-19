@@ -51,4 +51,4 @@ def load(n: int) -> np.ndarray:
 
 if __name__ == "__main__":
     with open("training_data.npz", "wb") as f:
-        np.savez(f, *load(100_000), allow_pickle=False)
+        np.savez(f, *load(100_000))
