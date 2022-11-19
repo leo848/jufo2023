@@ -1,7 +1,10 @@
 import chess.pgn
 
+import numpy as np
 
-def board_to_input(board) -> list[float]:
+from typing import Tuple
+
+def board_to_input(board) -> np.ndarray:
     result = [float(board.turn)]
     for square in chess.SQUARES:
         piece = board.piece_at(square)
@@ -19,16 +22,17 @@ def board_to_input(board) -> list[float]:
                 ]
             )
     assert len(result) == (6 * 2 + 1) * 64 + 1
-    return result
+    return np.array(result)
 
 
-def move_to_output(move) -> list[float]:
+# Return a numpy array.
+def move_to_output(move) -> np.ndarray:
     """
     Converts a chess.Move to a list of floats.
     The first 64 numbers encode the 'from' field, the last 64 the 'to' field.
     The first number is the 'a1' square, the last is the 'h8' square.
     """
-    result = [0.0] * 128
+    result = np.zeros(128)
     result[move.from_square] = 1.0
     result[move.to_square + 64] = 1.0
     return result
@@ -39,15 +43,15 @@ def output_to_move(noutput: list[float]) -> chess.Move:
     to_square = max(enumerate(noutput[64:]), key=lambda p: p[1])[0]
     return chess.Move(from_square, to_square)
 
+def color(string: str, rgb: Tuple[int, int, int]) -> str:
+    return f"\x1b[38;2;{rgb[0]};{rgb[1]};{rgb[2]}m{string}\x1b[0m"
 
-def neuron_to_unicode(value: float, thresh: float = 0.5) -> str:
+def neuron_to_unicode(value: float, numbers: bool = False) -> str:
     if value > 1.0 or value < 0.0:
         raise ValueError("value must be in range (0.0 ..= 1.0)")
-    if value > thresh:
-        return "⚪"
-    else:
-        return "⚫"
-
+    if numbers:
+        return f"{value:.2f}"
+    return color("██", (int(value * 255), int(value * 255), int(value * 255)))
 
 def print_neural_input(ninput: list[float]):
     iterator = iter(ninput)
@@ -61,11 +65,23 @@ def print_neural_input(ninput: list[float]):
 
 
 def print_neural_output(noutput: list[float]):
-    iterator = iter(noutput)
-    for _ in range(2):
-        for _ in range(8):
-            for _ in range(8):
-                print(neuron_to_unicode(next(iterator)), end="")
-            print()
-        print()
-    print()
+    move_from = noutput[:64]
+    move_to = noutput[64:]
+
+    strings = ["" for _ in range(8)]
+
+    for row in range(8):
+        strings[7 - row] += "abcdefgh"[row] + " "
+        for col in range(8):
+            strings[7 - row] += neuron_to_unicode(move_from[row * 8 + col])
+
+    for row in range(8):
+        strings[7 - row] += "\t"
+        strings[7 - row] += "abcdefgh"[row] + " "
+        for col in range(8):
+            strings[7 - row] += neuron_to_unicode(move_to[row * 8 + col])
+
+    strings.append("  1 2 3 4 5 6 7 8 \t  1 2 3 4 5 6 7 8")
+    strings.append("")
+
+    print("\n".join(strings))
