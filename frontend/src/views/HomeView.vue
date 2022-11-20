@@ -1,5 +1,7 @@
 <template>
-  <Main />
+  <Suspense>
+    <Main />
+  </Suspense>
 </template>
 
 <script lang="ts">
