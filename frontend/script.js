@@ -1,15 +1,15 @@
-let model;
+let model = null;
 
 let board = createBoard();
 
 const $bestMoves = $("#best-moves");
 
-async function loadModel() {
-  model = await tf.loadLayersModel("js_models/model.json");
+async function loadModel(name) {
+  model = await tf.loadLayersModel(`models/${name}/model.json`);
   return model;
 }
 
-loadModel().then(update);
+loadModel(settings.model).then(update);
 
 function createBoard(options = {}) {
   return Chessboard("board", Object.assign(options, {
@@ -53,12 +53,12 @@ function onSnapEnd() {
 function update() {
   if (model == null) return;
 
-  const input = posToInput(game.fen());
+  const input = models[settings.model].encodeInput(game.fen());
   const output = model.predict(input).dataSync();
   let amount = 10;
   let moves = [];
   while (moves.length < 8 && amount < 10001) {
-    moves = outputToMoves(output, { amount })
+    moves = models[settings.model].decodeOutput(output, { amount })
       .map((obj) => Object.assign(obj, { move: getMove(obj) }))
       .map((obj) => Object.assign(obj, { valid: obj.move != null }))
       .filter(({ valid }) => settings.showInvalidMoves || valid);
@@ -102,7 +102,7 @@ function updateBestMoves(moves, amount = 8) {
         .append(
           $("<span>")
             .addClass("act")
-            .text((act * 100).toFixed(2)),
+            .text(act.toFixed(4).slice(1)),
           $("<span>")
             .addClass("move")
             .html(move ? moveToHtml(move) : `${from}-${to}`)

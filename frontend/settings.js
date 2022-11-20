@@ -5,6 +5,7 @@ const settings = {
     black: false,
   },
   theme: "gioco",
+  model: "original",
 };
 
 const $settings = $("#settings");
@@ -101,3 +102,9 @@ $settings.append(
 
 const $credit = $("<div>").attr("id", "credit");
 $settings.append($credit);
+
+const models = {
+  original: { encodeInput: Original.encodeInput, decodeOutput: Original.decodeOutput },
+};
+
+
