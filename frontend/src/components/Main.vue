@@ -1,7 +1,13 @@
 <template>
   <div>
-    <div id="board"></div>
-    <MoveDisplay :moves="moves" />
+    <v-row>
+      <v-col cols="12" sm="6">
+        <div id="board"></div>
+      </v-col>
+      <v-col cols="12" sm="6">
+        <MoveDisplay :moves="moves" />
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -13,15 +19,18 @@ import { loadFromToOutputModel } from '@/neural-models/model'
 import { fenToStandardPositionalInput, fromToOutputToMoves } from '@/neural-models/chess_conversions'
 import { game } from '@/chess/game'
 import type { Chessboard } from '@/chess/boardHandlers'
+import { getMove } from '@/chess/boardHandlers'
+import { loadPiece } from '@/chess/loadPieces';
 
 import MoveDisplay from '@/components/MoveDisplay.vue'
+import type { Move } from 'chess.js'
 
 export default {
   components: {
     MoveDisplay,
   },
   created() {
-    loadFromToOutputModel().then(m => this.model = m)
+    loadFromToOutputModel().then(m => this.model = m).then(this.update)
   },
   mounted() {
     this.board = Chessboard('#board', {
@@ -41,8 +50,7 @@ export default {
   }),
   methods: {
     pieceTheme(piece: string) {
-      const theme = "cardinal";
-      return `assets/img/chesspieces/${theme}/${piece}.svg`;
+      return loadPiece(piece);
     },
     onDrop(source: string, target: string) {
       let localGame = game;
@@ -63,16 +71,17 @@ export default {
       if (this.model === null) return;
       const input = game.fen();
       const output = this.model.predict(fenToStandardPositionalInput(input));
-      const moves = fromToOutputToMoves(output);
+      let amount = 10;
+      let moves: (MoveWithAct & {inner : null | Move })[] = [];
+      while (moves.length < 8 && amount <= 10000) {
+        moves = fromToOutputToMoves(output, { amount })
+          .map(obj => ({ ...obj, inner: getMove(obj) })) 
+          .filter(obj => obj.inner !== null)
+          .slice(0, 8) ;
+        amount *= 10;
+      }
       this.moves = moves;
     }
   },
 }
 </script>
-
-<style>
-#board {
-  width: 400px;
-  height: 400px;
-}
-</style>
