@@ -1,16 +1,16 @@
 <template>
-  <Suspense>
+  <div>
     <Main />
-  </Suspense>
+  </div>
 </template>
 
 <script lang="ts">
-import Main from '@/components/Main.vue';
+// Components
+import Main from '../components/Main.vue';
+
 export default {
+  name: 'HomeView',
+
   components: { Main },
 };
 </script>
-
-<style>
-
-</style>
