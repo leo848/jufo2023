@@ -38,3 +38,10 @@ export default {
   }),
 }
 </script>
+
+<style>
+#board {
+  width: 400px;
+  height: 400px;
+}
+</style>
