@@ -9,6 +9,7 @@
         <v-sheet
           :color="move.inner ? actToColor(move.act) : gray"
           :key="move.from + move.to + move.inner?.san"
+          @click="move.inner && makeMove(move.inner)"
           max-width="300"
           max-height="50"
           elevation="3"
@@ -25,6 +26,7 @@
 <script lang="ts">
 import type { Move } from "chess.js";
 import { loadPiece } from "@/chess/loadPieces";
+import { move } from "@/chess/game";
 
 export default {
   name: "MoveDisplay",
@@ -37,6 +39,9 @@ export default {
     console.log(this.moves);
   },
   methods: {
+    makeMove(m: Move) {
+      move(m);
+    },
     prettyMove(move: Move): string {
       let san = move.san;
       if (move.piece !== "p" && !san.startsWith("O")) san = san.slice(1);

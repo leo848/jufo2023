@@ -17,13 +17,13 @@ import type { FromToOutput, MoveWithAct, StandardPositionalInput } from '@/neura
 
 import { loadFromToOutputModel } from '@/neural-models/model'
 import { fenToStandardPositionalInput, fromToOutputToMoves } from '@/neural-models/chess_conversions'
-import { game } from '@/chess/game'
+import { game, addEvent } from '@/chess/game'
 import type { Chessboard } from '@/chess/boardHandlers'
 import { getMove } from '@/chess/boardHandlers'
 import { loadPiece } from '@/chess/loadPieces';
 
 import MoveDisplay from '@/components/MoveDisplay.vue'
-import type { Move } from 'chess.js'
+import type { Chess, Move } from 'chess.js'
 
 export default {
   components: {
@@ -41,6 +41,10 @@ export default {
       onDrop: this.onDrop,
       onSnapEnd: this.onSnapEnd,
     })
+    addEvent((game: Chess) => {
+      this.board.position(game.fen())
+      this.update();
+    })
   },
   data: () => ({
     message: 'Hello World!',
@@ -53,8 +57,7 @@ export default {
       return loadPiece(piece);
     },
     onDrop(source: string, target: string) {
-      let localGame = game;
-      let move = localGame.move({
+      let move = game.move({
         from: source,
         to: target,
       });
