@@ -10,7 +10,6 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@chrisoakman/chessboardjs": "^1.0.0",
     "@tensorflow/tfjs": "^4.1.0",
     "chess.js": "^1.0.0-alpha.0",
     "vue": "^3.2.41",
