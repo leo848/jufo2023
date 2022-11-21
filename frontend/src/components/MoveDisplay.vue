@@ -1,25 +1,29 @@
 <template>
-  <v-row>
+  <v-row class="mt-2">
+    <transition-group name="moves">
     <v-col
       v-for="move in moves"
       :key="move.from + move.to + move.inner?.san"
       cols="6" sm="12"
     >
-      <v-fade-transition>
-        <v-sheet
-          :color="move.inner ? actToColor(move.act) : gray"
-          :key="move.from + move.to + move.inner?.san"
-          @click="move.inner && makeMove(move.inner)"
-          max-width="300"
-          max-height="50"
-          elevation="3"
-          rounded="lg"
-          >
-          <div v-if="move.inner" v-html="prettyMove(move.inner)" />
+    <v-card
+      :color="move.inner ? actToColor(move.act) : gray"
+      :key="move.from + move.to + move.inner?.san"
+      @click="move.inner && makeMove(move.inner)"
+      max-width="300"
+      max-height="50"
+      elevation="3"
+      rounded="lg"
+      >
+      <div class="d-flex flex-row justify-space-between">
+        <div v-if="move.inner" v-html="prettyMove(move.inner)" />
           <div v-else>{{ move.from }} - {{ move.to }}</div>
-          </v-sheet>
-      </v-fade-transition>
-    </v-col>
+          <div class="text-disabled mr-1">
+            {{ move.act.toFixed(4).slice(1) }}
+          </div>
+        </div>
+    </v-card>
+    </v-col></transition-group>
   </v-row>
 </template>
 
@@ -84,4 +88,22 @@ export default {
   margin-left: 0.5em;
   margin-right: 0.5em;
 }
+
+.moves-move,
+.moves-enter-active,
+.moves-leave-active {
+  transition: all 0.5s ease;
+}
+.moves-enter-from,
+.moves-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.moves-leave-active {
+  position: absolute;
+  z-index: -1;
+}
+
+
 </style>

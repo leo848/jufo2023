@@ -2,7 +2,7 @@
   <div>
     <v-row>
       <v-col cols="12" sm="6">
-        <div id="board"></div>
+        <div id="board" class="mt-2"></div>
       </v-col>
       <v-col cols="12" sm="6">
         <MoveDisplay :moves="moves" />
