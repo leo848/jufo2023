@@ -1,10 +1,10 @@
 <template>
   <div>
     <v-row>
-      <v-col cols="12" sm="6">
-        <div id="board" class="mt-2"></div>
+      <v-col cols="12" sm="6" lg="4">
+        <div id="board"></div>
       </v-col>
-      <v-col cols="12" sm="6">
+      <v-col cols="12" sm="6" lg="4">
         <MoveDisplay :moves="moves" />
       </v-col>
     </v-row>

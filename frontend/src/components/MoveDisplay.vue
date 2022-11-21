@@ -1,5 +1,5 @@
 <template>
-  <v-row class="mt-2">
+  <v-row>
     <transition-group name="moves">
     <v-col
       v-for="move in moves"
@@ -18,7 +18,7 @@
       <div class="d-flex flex-row justify-space-between">
         <div v-if="move.inner" v-html="prettyMove(move.inner)" />
           <div v-else>{{ move.from }} - {{ move.to }}</div>
-          <div class="text-disabled mr-1">
+          <div class="text-gray mr-1">
             {{ move.act.toFixed(4).slice(1) }}
           </div>
         </div>
@@ -62,8 +62,8 @@ export default {
       // It is red when the activation is 0 and green when the activation is 1.
       // The gradient is logarithmic.
       let newAct = this.interpolate(25)(act);
-      let red = Math.min(1.0, 2.0 - 2.0 * newAct) * 255;
-      let green = Math.min(1.0, 2.0 * newAct) * 255;
+      let red = Math.min(1.0, 2.0 - 2.0 * newAct) * 200;
+      let green = Math.min(1.0, 2.0 * newAct) * 200;
       return `rgb(${red}, ${green}, 0)`;
     },
   },
@@ -92,7 +92,7 @@ export default {
 .moves-move,
 .moves-enter-active,
 .moves-leave-active {
-  transition: all 0.5s ease;
+  transition: all 0.25s ease;
 }
 .moves-enter-from,
 .moves-leave-to {
