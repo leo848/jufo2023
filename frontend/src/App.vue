@@ -9,11 +9,11 @@
           v-model="dialog"
           activator="parent"
           >
-          <SettingsDialog @close="dialog = false" />
+          <SettingsDialog @close="newSettings" />
         </v-dialog>
       </v-btn>
     </v-app-bar>
-    <v-main class="mt-4">
+    <v-main class="mt-4" :key="mainKey">
       <router-view/>
     </v-main>
   </v-app>
@@ -25,6 +25,16 @@ import SettingsDialog from '@/components/SettingsDialog.vue'
 export default {
   name: 'App',
   components: { SettingsDialog },
+  data: () => ({
+    dialog: false,
+    mainKey: 0,
+  }),
+  methods: {
+    newSettings() {
+      this.mainKey++;
+      this.dialog = false;
+    }
+  },
   mounted() {
     const professionalGradients = [
       [ '#872A97', '#3F51B5' ],
@@ -35,9 +45,6 @@ export default {
     const randomGradient = professionalGradients[Math.floor(Math.random() * professionalGradients.length)];
     ((this.$refs['app-bar'] as any).$el as HTMLElement).style.background = `linear-gradient(to right, ${randomGradient[0]}, ${randomGradient[1]})`;
   },
-  data: () => ({
-    dialog: false
-  })
 }
 </script>
 

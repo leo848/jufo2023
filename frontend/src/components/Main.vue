@@ -2,7 +2,7 @@
   <div>
     <v-row>
       <v-col cols="12" sm="6" lg="4">
-        <div id="board"></div>
+        <div ref="board"></div>
       </v-col>
       <v-col cols="12" sm="6" lg="4">
         <MoveDisplay :moves="moves" />
@@ -17,13 +17,13 @@ import type { FromToOutput, MoveWithAct, StandardPositionalInput } from '@/neura
 
 import { loadModel } from '@/neural-models/model'
 import { fenToStandardPositionalInput, fromToOutputToMoves } from '@/neural-models/chess_conversions'
-import { game, addEvent, isSquare } from '@/chess/game'
-import type { Chessboard } from '@/chess/boardHandlers'
+import { game, addEvent, removeEvent, isSquare } from '@/chess/game'
 import { getMove } from '@/chess/boardHandlers'
 import { loadPiece } from '@/chess/loadPieces';
 
 import MoveDisplay from '@/components/MoveDisplay.vue'
 import type { Chess, Move } from 'chess.js'
+import { loadSetting } from '@/settings/settings'
 
 export default {
   components: {
@@ -33,7 +33,7 @@ export default {
     loadModel("vertical-model").then(m => this.model = m).then(this.update)
   },
   mounted() {
-    this.board = Chessboard('#board', {
+    this.board = (window["Chessboard" as any] as any)(this.$refs.board, {
       draggable: true,
       dropOffBoard: "trash",
       position: "start",
@@ -42,18 +42,22 @@ export default {
       onDragStart: this.onDragStart,
       onSnapEnd: this.onSnapEnd,
     })
-    addEvent((game: Chess) => {
+    this.event = addEvent((game: Chess) => {
       this.board.position(game.fen())
       this.update();
-    })
+    });
 
-    document.getElementById('board')!.addEventListener('scroll touchmove touchend touchstart contextmenu', (e) => {
+    (this.$refs.board as HTMLElement).addEventListener('scroll touchmove touchend touchstart contextmenu', (e) => {
       alert(e);
       e.preventDefault()
     });
   },
+  beforeUnmount() {
+    removeEvent(this.event);
+  },
   data: () => ({
     message: 'Hello World!',
+    event: 0,
     model: null as Model<StandardPositionalInput, FromToOutput> | null,
     moves: [] as MoveWithAct[],
     board: null as any | null,
@@ -89,10 +93,11 @@ export default {
       const output = this.model.predict(fenToStandardPositionalInput(input));
       let amount = 10;
       let moves: (MoveWithAct & {inner : null | Move })[] = [];
+      const onlyShowLegalMoves = loadSetting("onlyShowLegalMoves");
       while (moves.length < 8 && amount <= 10000) {
         moves = fromToOutputToMoves(output, { amount })
           .map(obj => ({ ...obj, inner: getMove(obj) })) 
-          .filter(obj => obj.inner !== null)
+          .filter(obj => !onlyShowLegalMoves || obj.inner !== null)
           .slice(0, 8) ;
         amount *= 10;
       }

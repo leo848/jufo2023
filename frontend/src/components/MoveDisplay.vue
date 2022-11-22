@@ -17,7 +17,7 @@
       >
       <div class="d-flex flex-row justify-space-between">
         <div v-if="move.inner" v-html="prettyMove(move.inner)" />
-          <div v-else>{{ move.from }} - {{ move.to }}</div>
+          <div v-else class="text-h5 pl-2 py-1">{{ move.from }} - {{ move.to }}</div>
           <div class="text-gray mr-1">
             {{ move.act.toFixed(4).slice(1) }}
           </div>

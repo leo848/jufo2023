@@ -2,15 +2,27 @@ import {Chess, type Square} from "chess.js";
 
 export let game = new Chess();
 
-const events: ((game: Chess) => void)[] = [];
+const events: Record<number, ((game: Chess) => void)> = {};
 
-export function addEvent(event: (game: Chess) => void) {
-  events.push(event);
+let number = 69;
+
+export function addEvent(event: (game: Chess) => void): number {
+  events[number] = event;
+  for (const event of Object.values(events)) {
+    event(game);
+  }
+  return number++;
+}
+
+export function removeEvent(id: number) {
+  delete events[id];
 }
 
 export function move(move: string | {from: string; to: string; promotion?: string | undefined;}) {
   game.move(move);
-  events.forEach(event => event(game));
+  for (const event of Object.values(events)) {
+    event(game);
+  }
 }
 
 export function isSquare(str: string): str is Square {
