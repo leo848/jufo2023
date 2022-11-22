@@ -10,10 +10,7 @@ export function addEvent(event: (game: Chess) => void) {
 
 export function move(move: string | {from: string; to: string; promotion?: string | undefined;}) {
   game.move(move);
-  events.forEach(event => {
-    console.log(event);
-    event(game);
-  });
+  events.forEach(event => event(game));
 }
 
 export function isSquare(str: string): str is Square {
