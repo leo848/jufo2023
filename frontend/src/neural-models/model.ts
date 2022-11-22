@@ -13,6 +13,7 @@ type ModelOutput<M> = M extends Model<any, infer O> ? O : never;
 type Models = {
   "original": Model<StandardPositionalInput, FromToOutput>
   "vertical-model": Model<StandardPositionalInput, FromToOutput>
+  "ole-model": Model<StandardPositionalInput, FromToOutput>
 }
 
 async function loadTfModel(name: string): Promise<LayersModel> {

@@ -17,7 +17,7 @@ import type { FromToOutput, MoveWithAct, StandardPositionalInput } from '@/neura
 
 import { loadModel } from '@/neural-models/model'
 import { fenToStandardPositionalInput, fromToOutputToMoves } from '@/neural-models/chess_conversions'
-import { game, addEvent } from '@/chess/game'
+import { game, addEvent, isSquare } from '@/chess/game'
 import type { Chessboard } from '@/chess/boardHandlers'
 import { getMove } from '@/chess/boardHandlers'
 import { loadPiece } from '@/chess/loadPieces';
@@ -39,6 +39,7 @@ export default {
       position: "start",
       pieceTheme: this.pieceTheme,
       onDrop: this.onDrop,
+      onDragStart: this.onDragStart,
       onSnapEnd: this.onSnapEnd,
     })
     addEvent((game: Chess) => {
@@ -60,6 +61,13 @@ export default {
   methods: {
     pieceTheme(piece: string) {
       return loadPiece(piece);
+    },
+    onDragStart(source: string, piece: string, _position: string, _orientation: string) {
+      if (!isSquare(source)) throw new Error("source isn't square");
+      if (game.isGameOver()) return false;
+      if (game.turn() === "w" && piece.search(/^b/) !== -1) return false;
+      if (game.turn() === "b" && piece.search(/^w/) !== -1) return false;
+      if (game.moves({ square: source }).length === 0) return false;
     },
     onDrop(source: string, target: string) {
       let move = game.move({

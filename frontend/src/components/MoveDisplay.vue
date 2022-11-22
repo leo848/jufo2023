@@ -39,9 +39,6 @@ export default {
     interpolate: (t: number) => (x: number) =>
       1 + 1 / t - 1 / (t * x + 1) - 1 / (t * t * x + t),
   }),
-  created() {
-    console.log(this.moves);
-  },
   methods: {
     makeMove(m: Move) {
       move(m);
