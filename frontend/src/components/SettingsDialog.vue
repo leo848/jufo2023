@@ -4,7 +4,11 @@
     <v-card-text>
       <v-container>
         <v-row>
-          <v-col cols="12">
+          <v-col cols="12" md="6">
+            <v-select v-model="settings.theme" :items="themes" density="comfortable" label="Piece theme"/> <!-- TODO: custom menu -->
+                      <span>by {{ license.by }} <span v-if="license.license">under {{ license.license }}</span></span>
+          </v-col>
+          <v-col cols="12" md="6">
             <v-switch
               v-model="settings.onlyShowLegalMoves"
               color="primary"
@@ -25,11 +29,18 @@
 
 <script lang="ts">
 import { loadSettings, saveSettings } from '@/settings/settings';
+import { themes, themesLicenses } from '@/chess/loadPieces';
 
 export default {
   data: () => ({
     settings: loadSettings(),
+    themes: themes,
   }),
+  computed: {
+    license() {
+      return themesLicenses[this.settings.theme];
+    }
+  },
   methods: {
     save() {
       saveSettings(this.settings);
@@ -38,7 +49,3 @@ export default {
   },
 }
 </script>
-
-<style>
-
-</style>
