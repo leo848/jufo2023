@@ -1,6 +1,6 @@
 <template>
   <v-card min-height="200px">
-    <v-card-title class="headline">Settings</v-card-title>
+    <v-card-title class="text-h5">Settings</v-card-title>
     <v-spacer />
     <v-card-actions>
       <v-spacer />
