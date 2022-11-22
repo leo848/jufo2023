@@ -9,18 +9,22 @@ import os.path
 
 from filenames import MODEL_NAME
 
+if os.path.isfile(MODEL_NAME):
+    print("Model already exists. Exiting.")
+    exit(1)
+
 # Load the data
 npzfile = np.load("training_data.npz")
 x, y = npzfile["arr_0"], npzfile["arr_1"]
-x_train, x_test = x[:80_000], x[80_000:]
-y_train, y_test = y[:80_000], y[80_000:]
+x_train, x_test = x[10_000:], x[:10_000]
+y_train, y_test = y[10_000:], y[:10_000]
 
 model = models.Sequential()
-model.add(layers.Dense(64, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
-model.add(layers.Dense(64, activation='relu'))
-model.add(layers.Dense(64, activation='relu'))
-model.add(layers.Dense(64, activation='relu'))
-model.add(layers.Dense(64, activation='relu'))
+model.add(layers.Dense(256, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
+model.add(layers.Dense(256, activation='relu'))
+model.add(layers.Dense(256, activation='relu'))
+model.add(layers.Dense(256, activation='relu'))
+model.add(layers.Dense(256, activation='relu'))
 model.add(layers.Dense(128, activation='sigmoid'))
 
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])

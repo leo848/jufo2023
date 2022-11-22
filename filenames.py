@@ -1,2 +1,2 @@
-MODEL_NAME = "models/higher_batch.h5"
+MODEL_NAME = "models/vertical-model.h5"
 PGN_DATABASE = "database.pgn"

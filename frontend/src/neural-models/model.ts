@@ -1,24 +1,30 @@
 import type {LayersModel} from '@tensorflow/tfjs';
 import * as tf from '@tensorflow/tfjs';
-import type {FromToOutput, StandardPositionalInput} from './types';
+import type {CompleteOutput, FromToOutput, StandardPositionalInput} from './types';
 
 export interface Model<I, O> {
   name: string;
   predict(input: I): O;
 }
 
-export async function loadModel(name: string): Promise<LayersModel> {
+type ModelInput<M> = M extends Model<infer I, any> ? I : never;
+type ModelOutput<M> = M extends Model<any, infer O> ? O : never;
+
+type Models = {
+  "original": Model<StandardPositionalInput, FromToOutput>
+  "vertical-model": Model<StandardPositionalInput, FromToOutput>
+}
+
+async function loadTfModel(name: string): Promise<LayersModel> {
   return await tf.loadLayersModel(`models/${name}/model.json`);
 }
 
-export async function loadFromToOutputModel(name="original"): Promise<Model<StandardPositionalInput, FromToOutput>> {
-  const model = await loadModel(name);
-  return {
-    name,
-    predict: (input: StandardPositionalInput) => {
-      const prediction = model.predict(tf.tensor(input, [1, 833])) as tf.Tensor;
-      const output = prediction.dataSync() as FromToOutput;
-      return output;
-    },
+export async function loadModel<K extends keyof Models>(name: K): Promise<Models[K]> {
+  const model = await loadTfModel(name);
+  let predict = (input: ModelInput<Models[K]>) => {
+    const prediction = model.predict(tf.tensor(input, [1, 833])) as tf.Tensor;
+    const output = prediction.dataSync() as ModelOutput<Models[K]>;
+    return output;
   };
+  return { name, predict } as Models[K];
 }

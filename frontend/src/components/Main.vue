@@ -15,7 +15,7 @@
 import type { Model } from '@/neural-models/model'
 import type { FromToOutput, MoveWithAct, StandardPositionalInput } from '@/neural-models/types'
 
-import { loadFromToOutputModel } from '@/neural-models/model'
+import { loadModel } from '@/neural-models/model'
 import { fenToStandardPositionalInput, fromToOutputToMoves } from '@/neural-models/chess_conversions'
 import { game, addEvent } from '@/chess/game'
 import type { Chessboard } from '@/chess/boardHandlers'
@@ -30,7 +30,7 @@ export default {
     MoveDisplay,
   },
   created() {
-    loadFromToOutputModel().then(m => this.model = m).then(this.update)
+    loadModel("vertical-model").then(m => this.model = m).then(this.update)
   },
   mounted() {
     this.board = Chessboard('#board', {
@@ -45,6 +45,11 @@ export default {
       this.board.position(game.fen())
       this.update();
     })
+
+    document.getElementById('board')!.addEventListener('scroll touchmove touchend touchstart contextmenu', (e) => {
+      alert(e);
+      e.preventDefault()
+    });
   },
   data: () => ({
     message: 'Hello World!',
