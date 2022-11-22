@@ -1,10 +1,16 @@
 <template>
   <v-app>
-    <v-app-bar app floating id="app-bar-linear-gradient">
+    <v-app-bar ref="app-bar" app floating>
       <v-app-bar-title>Chess using neural networks</v-app-bar-title>
       <v-spacer></v-spacer>
       <v-btn icon>
         <v-icon>mdi-cog</v-icon>
+        <v-dialog
+          v-model="dialog"
+          activator="parent"
+          >
+          <SettingsDialog @close="dialog = false" />
+        </v-dialog>
       </v-btn>
     </v-app-bar>
     <v-main class="mt-4">
@@ -14,11 +20,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import SettingsDialog from '@/components/SettingsDialog.vue'
 
-export default defineComponent({
+export default {
   name: 'App',
-})
+  components: { SettingsDialog },
+  mounted() {
+    const professionalGradients = [
+      [ '#872A97', '#3F51B5' ],
+      [ '#F44336', '#FFEB3B' ],
+      [ '#EEAB3B', '#F44336' ],
+      [ '#3F51B5', '#872A97' ],
+    ];
+    const randomGradient = professionalGradients[Math.floor(Math.random() * professionalGradients.length)];
+    ((this.$refs['app-bar'] as any).$el as HTMLElement).style.background = `linear-gradient(to right, ${randomGradient[0]}, ${randomGradient[1]})`;
+  },
+  data: () => ({
+    dialog: false
+  })
+}
 </script>
 
 <style scoped>
