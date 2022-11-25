@@ -5,7 +5,6 @@ export const themes = [
   "cardinal",
   "chess7",
   "companion",
-  "disguised",
   "dubrovny",
   "fantasy",
   "fresca",
@@ -27,6 +26,20 @@ const licenses = {
   Mit: "MIT",
 } as const;
 
+export const pieces = [
+  'P',
+  'N',
+  'B',
+  'R',
+  'Q',
+  'K',
+] as const;
+
+export const colors = [
+  'w',
+  'b',
+] as const;
+
 export const themesLicenses: Record<PieceTheme, { by: string, license?: typeof licenses[keyof typeof licenses] }> = {
   horsey: { by: "cham and michael1241", license: licenses.ByNcSa },
   shapes: { by: "flugsio", license: licenses.BySa },
@@ -40,7 +53,6 @@ export const themesLicenses: Record<PieceTheme, { by: string, license?: typeof l
   dubrovny: { by: "sadsnake1", license: licenses.ByNcSa },
   libra: { by: "sadsnake1", license: licenses.ByNcSa },
   anarcandy: { by: "caderek", license: licenses.ByNcSa },
-  disguised: { by: "danegraphics", license: licenses.ByNcSa },
   chess7: { by: "Style-7"},
   companion: { by: "David L. Brown"},
   fantasy: { by: "Maurizio Monge"},
@@ -49,8 +61,9 @@ export const themesLicenses: Record<PieceTheme, { by: string, license?: typeof l
 };
 
 export type PieceTheme = typeof themes[number];
+export type PieceColor = typeof colors[number];
+export type PieceName = typeof pieces[number];
 
-export function loadPiece(piece: string): string {
-  const theme: PieceTheme = loadSetting("theme");
+export function loadPiece(piece: string, theme: PieceTheme = loadSetting("theme")): string {
   return `assets/img/chesspieces/${theme}/${piece}.svg`;
 }

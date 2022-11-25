@@ -19,7 +19,8 @@
         <div v-if="move.inner" v-html="prettyMove(move.inner)" />
           <div v-else class="text-h5 pl-2 py-1">{{ move.from }} - {{ move.to }}</div>
           <div class="text-gray mr-1">
-            {{ move.act.toFixed(4).slice(1) }}
+            {{ move.act.toFixed(4).slice(1) }}<br/>
+            <div v-if="showIndex" class="mt-n2">#{{ move.index }}</div>
           </div>
         </div>
     </v-card>
@@ -31,6 +32,7 @@
 import type { Move } from "chess.js";
 import { loadPiece } from "@/chess/loadPieces";
 import { move } from "@/chess/game";
+import { loadSetting } from "@/settings/settings";
 
 export default {
   name: "MoveDisplay",
@@ -38,6 +40,7 @@ export default {
     gray: "grey lighten-3",
     interpolate: (t: number) => (x: number) =>
       1 + 1 / t - 1 / (t * x + 1) - 1 / (t * t * x + t),
+    showIndex: loadSetting("onlyShowLegalMoves"),
   }),
   methods: {
     makeMove(m: Move) {

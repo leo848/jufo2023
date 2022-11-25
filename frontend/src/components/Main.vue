@@ -5,7 +5,13 @@
         <div ref="board"></div>
       </v-col>
       <v-col cols="12" sm="6" lg="4">
-        <MoveDisplay :moves="moves" />
+        <MoveDisplay v-if="model" :moves="moves" />
+        <v-card v-else max-width="300px">
+          <v-card-title>Loading model...</v-card-title>
+          <v-card-text>
+            <v-progress-circular :size="50" :width="6" indeterminate />
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
   </div>
@@ -92,11 +98,11 @@ export default {
       const input = game.fen();
       const output = this.model.predict(fenToStandardPositionalInput(input));
       let amount = 10;
-      let moves: (MoveWithAct & {inner : null | Move })[] = [];
+      let moves: (MoveWithAct & {inner : null | Move, index: number })[] = [];
       const onlyShowLegalMoves = loadSetting("onlyShowLegalMoves");
       while (moves.length < 8 && amount <= 10000) {
         moves = fromToOutputToMoves(output, { amount })
-          .map(obj => ({ ...obj, inner: getMove(obj) })) 
+          .map((obj, index) => ({ ...obj, inner: getMove(obj), index: index + 1 })) 
           .filter(obj => !onlyShowLegalMoves || obj.inner !== null)
           .slice(0, 8) ;
         amount *= 10;

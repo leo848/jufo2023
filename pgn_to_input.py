@@ -1,5 +1,6 @@
 import numpy as np
 import chess.pgn
+import random
 
 from itertools import count, islice
 from more_itertools import flatten
@@ -31,14 +32,14 @@ def inspect(iterator):
 def load(n: int) -> np.ndarray:
     def output_if_significant(iterator):
         for (index, value) in enumerate(iterator, 1):
-            if index % 1000 == 0:
-                print(f"Processed {index} / {n} boards")
+            if index % 100 == 0:
+                print(f"Processed {index} / {n} boards\r")
             yield value
 
     file = open(PGN_DATABASE)
     games = map(lambda _: chess.pgn.read_game(file), count())
     games = filter(is_valid_game, games)
-    boards = flatten(map(game_to_boards, games))
+    boards = flatten(random.sample(map(game_to_boards, games), 10))
     boards = islice(boards, n)
     boards = output_if_significant(boards)
     boards, moves = zip(*boards)

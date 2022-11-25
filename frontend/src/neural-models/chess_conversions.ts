@@ -1,4 +1,9 @@
-import type { StandardPositionalInput, FromToOutput, MoveWithAct } from "./types";
+import type {
+  StandardPositionalInput,
+  FromToOutput,
+  MoveWithAct,
+  CompleteOutput,
+} from "./types";
 
 import { Chess } from "chess.js";
 
@@ -56,28 +61,50 @@ export function fromToOutputToMoves(
 ): MoveWithAct[] {
   const { amount } = options;
 
-    let [fromMoves, toMoves] = [
-      [...output.slice(0, 64)],
-      [...output.slice(64, 128)],
-    ].map((arr) => {
-      return arr
-        .map((act, i) => [act, i])
-        .map(([act, i]) => [act, i % 8, Math.floor(i / 8)]);
+  let [fromMoves, toMoves] = [
+    [...output.slice(0, 64)],
+    [...output.slice(64, 128)],
+  ].map((arr) => {
+    return arr
+      .map((act, i) => [act, i])
+      .map(([act, i]) => [act, i % 8, Math.floor(i / 8)]);
+  });
+
+  let moves = fromMoves
+    .map(([act1, x1, y1]) => {
+      return toMoves.map(([act2, x2, y2]) => {
+        return [act1 * act2, [x1, y1], [x2, y2]] as const;
+      });
+    })
+    .flat()
+    .sort((a, b) => b[0] - a[0])
+    .slice(0, amount)
+    .map(([act, from, to]) => {
+      let intToChar = (i: number) => String.fromCharCode(97 + i);
+      return {
+        act,
+        from: intToChar(from[0]) + (from[1] + 1),
+        to: intToChar(to[0]) + (to[1] + 1),
+      };
     });
 
-    let moves = fromMoves
-      .map(([act1, x1, y1]) => {
-        return toMoves.map(([act2, x2, y2]) => {
-          return [act1 * act2, [x1, y1], [x2, y2]] as const;
-        });
-      })
-      .flat()
-      .sort((a, b) => b[0] - a[0])
-      .slice(0, amount)
-      .map(([act, from, to]) => {
-        let intToChar = (i: number) => String.fromCharCode(97 + i);
-        return { act, from: intToChar(from[0]) + (from[1] + 1), to: intToChar(to[0]) + (to[1] + 1) };
-      });
+  return moves;
+}
 
-      return moves;
+export function completeOutputToMoves(
+  output: CompleteOutput,
+  options: { amount: number } = { amount: 10 }
+) {
+  const { amount } = options;
+
+  let moves = [...output]
+    .map((act, i) => [act, [i / 64, i % 64]] as const)
+    .map(([act, [from, to]]) => {
+      let intToChar = (i: number) => String.fromCharCode(97 + i);
+      return {
+        act,
+        from: intToChar(from % 8) + (Math.floor(from / 8) + 1),
+        to: intToChar(to % 8) + (Math.floor(to / 8) + 1),
+      };
+    });
 }

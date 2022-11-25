@@ -4,11 +4,15 @@
     <v-card-text>
       <v-container>
         <v-row>
-          <v-col cols="12" md="6">
-            <v-select v-model="settings.theme" :items="themes" density="comfortable" label="Piece theme"/> <!-- TODO: custom menu -->
-                      <span>by {{ license.by }} <span v-if="license.license">under {{ license.license }}</span></span>
+          <v-col cols="12">
+            <v-menu v-model="pieceThemeMenu" :close-on-content-click="false">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" class="mr-4" color="primary">{{ settings.theme }}</v-btn>
+              </template>
+              <ChooseTheme @select="selectTheme"/>
+            </v-menu>
+            <span>by {{ license.by }} <span v-if="license.license">under {{ license.license }}</span></span>
           </v-col>
-          <v-col cols="0" md="6"></v-col>
           <v-col cols="12" md="6">
             <v-switch
               v-model="settings.onlyShowLegalMoves"
@@ -30,12 +34,16 @@
 
 <script lang="ts">
 import { loadSettings, saveSettings } from '@/settings/settings';
-import { themes, themesLicenses } from '@/chess/loadPieces';
+import { themes, themesLicenses, type PieceTheme } from '@/chess/loadPieces';
+
+import ChooseTheme from '@/components/ChooseTheme.vue';
 
 export default {
+  components: { ChooseTheme },
   data: () => ({
     settings: loadSettings(),
     themes: themes,
+    pieceThemeMenu: false,
   }),
   computed: {
     license() {
@@ -46,6 +54,10 @@ export default {
     save() {
       saveSettings(this.settings);
       this.$emit('close');
+    },
+    selectTheme(theme: PieceTheme) {
+      this.settings.theme = theme;
+      this.pieceThemeMenu = false;
     },
   },
 }
