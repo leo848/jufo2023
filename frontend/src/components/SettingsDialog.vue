@@ -8,6 +8,7 @@
             <v-select v-model="settings.theme" :items="themes" density="comfortable" label="Piece theme"/> <!-- TODO: custom menu -->
                       <span>by {{ license.by }} <span v-if="license.license">under {{ license.license }}</span></span>
           </v-col>
+          <v-col cols="0" md="6"></v-col>
           <v-col cols="12" md="6">
             <v-switch
               v-model="settings.onlyShowLegalMoves"

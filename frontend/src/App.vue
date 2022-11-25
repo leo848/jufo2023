@@ -8,6 +8,7 @@
         <v-dialog
           v-model="dialog"
           activator="parent"
+          max-width="600px"
           >
           <SettingsDialog @close="newSettings" />
         </v-dialog>
