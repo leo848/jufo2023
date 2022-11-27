@@ -19,10 +19,10 @@
 
 <script lang="ts">
 import type { Model } from '@/neural-models/model'
-import type { FromToOutput, MoveWithAct, StandardPositionalInput } from '@/neural-models/types'
+import type { CompleteOutput, MoveWithAct, StandardPositionalInput } from '@/neural-models/types'
 
 import { loadModel } from '@/neural-models/model'
-import { fenToStandardPositionalInput, fromToOutputToMoves } from '@/neural-models/chess_conversions'
+import { completeOutputToMoves, fenToStandardPositionalInput } from '@/neural-models/chess_conversions'
 import { game, addEvent, removeEvent, isSquare } from '@/chess/game'
 import { getMove } from '@/chess/boardHandlers'
 import { loadPiece } from '@/chess/loadPieces';
@@ -36,8 +36,15 @@ export default {
     MoveDisplay,
   },
   created() {
-    loadModel("vertical-model").then(m => this.model = m).then(this.update)
+    loadModel("complete-model").then(m => this.model = m).then(this.update)
   },
+  data: () => ({
+    message: 'Hello World!',
+    event: 0,
+    model: null as Model<StandardPositionalInput, CompleteOutput> | null,
+    moves: [] as MoveWithAct[],
+    board: null as any | null,
+  }),
   mounted() {
     this.board = (window["Chessboard" as any] as any)(this.$refs.board, {
       draggable: true,
@@ -61,13 +68,6 @@ export default {
   beforeUnmount() {
     removeEvent(this.event);
   },
-  data: () => ({
-    message: 'Hello World!',
-    event: 0,
-    model: null as Model<StandardPositionalInput, FromToOutput> | null,
-    moves: [] as MoveWithAct[],
-    board: null as any | null,
-  }),
   methods: {
     pieceTheme(piece: string) {
       return loadPiece(piece);
@@ -101,7 +101,7 @@ export default {
       let moves: (MoveWithAct & {inner : null | Move, index: number })[] = [];
       const onlyShowLegalMoves = loadSetting("onlyShowLegalMoves");
       while (moves.length < 8 && amount <= 10000) {
-        moves = fromToOutputToMoves(output, { amount })
+        moves = completeOutputToMoves(output, { amount })
           .map((obj, index) => ({ ...obj, inner: getMove(obj), index: index + 1 })) 
           .filter(obj => !onlyShowLegalMoves || obj.inner !== null)
           .slice(0, 8) ;

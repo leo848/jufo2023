@@ -94,7 +94,7 @@ export function fromToOutputToMoves(
 export function completeOutputToMoves(
   output: CompleteOutput,
   options: { amount: number } = { amount: 10 }
-) {
+): MoveWithAct[] {
   const { amount } = options;
 
   let moves = [...output]
@@ -107,4 +107,6 @@ export function completeOutputToMoves(
         to: intToChar(to % 8) + (Math.floor(to / 8) + 1),
       };
     });
+
+  return moves.sort((a, b) => b.act - a.act).slice(0, amount);
 }

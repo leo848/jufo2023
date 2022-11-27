@@ -2,6 +2,8 @@ import chess.pgn
 
 import numpy as np
 
+from enum import Enum, auto
+
 from typing import Tuple
 
 def board_to_input(board) -> np.ndarray:
@@ -25,7 +27,6 @@ def board_to_input(board) -> np.ndarray:
     return np.array(result)
 
 
-# Return a numpy array.
 def move_to_output(move) -> np.ndarray:
     """
     Converts a chess.Move to a list of floats.
@@ -36,6 +37,9 @@ def move_to_output(move) -> np.ndarray:
     result[move.from_square] = 1.0
     result[move.to_square + 64] = 1.0
     return result
+
+def move_to_complete_output(move) -> int:
+    return move.from_square * 64 + move.to_square
 
 
 def output_to_move(noutput: list[float]) -> chess.Move:
