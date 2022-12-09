@@ -1,7 +1,8 @@
-import tensorflow as tf
 import numpy as np
 
+import tensorflow as tf
 from board_code import board_to_input, output_to_move
+
 
 def board_to_move(model, board):
     """

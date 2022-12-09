@@ -1,9 +1,8 @@
-from itertools import count, islice
+import os.path
 import time
+from itertools import count, islice
 
 import chess.pgn
-import os.path
-
 from board_code import *
 from pgn_to_input import *
 
@@ -59,4 +58,3 @@ def load_games():
 
 if __name__ == "__main__":
     load_games()
-

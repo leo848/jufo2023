@@ -1,10 +1,10 @@
-import chess.pgn
+from enum import Enum, auto
+from typing import Tuple
 
 import numpy as np
 
-from enum import Enum, auto
+import chess.pgn
 
-from typing import Tuple
 
 def board_to_input(board) -> np.ndarray:
     result = [float(board.turn)]

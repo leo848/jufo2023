@@ -1,14 +1,13 @@
-import numpy as np
-import chess.pgn
 import random
 import time
-
 from itertools import count, islice
+
+import numpy as np
+
+import chess.pgn
+from board_code import board_to_input, move_to_complete_output, move_to_output
+from filenames import NUMPY_FILE, PGN_DATABASE
 from more_itertools import flatten, unique_everseen
-
-from board_code import board_to_input, move_to_output, move_to_complete_output
-
-from filenames import PGN_DATABASE, NUMPY_FILE
 
 
 def is_valid_game(game) -> bool:

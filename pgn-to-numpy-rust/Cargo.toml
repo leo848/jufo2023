@@ -1,0 +1,24 @@
+[package]
+name = "pgn-to-numpy"
+version = "0.1.0"
+edition = "2021"
+
+[profile.dev]
+opt-level = 2
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+
+[profile.dev.package."*"]
+opt-level = 3
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+itertools = "0.10.5"
+npyz = "0.7.1"
+pgn-reader = "0.21.0"
+rand = "0.8.5"
+shakmaty = "0.22.0"

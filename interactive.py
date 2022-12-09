@@ -1,15 +1,13 @@
 import os.path
+
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras import models, layers
 
 import chess
-
+import tensorflow as tf
 from abstraction import board_to_move
-
 from board_code import board_to_input, move_to_output, print_neural_output
-
 from filenames import MODEL_NAME
+from tensorflow.keras import layers, models
 
 if not os.path.isfile(MODEL_NAME):
     exit(1)
@@ -46,4 +44,3 @@ def game_loop():
 
 if __name__ == "__main__":
     game_loop()
-

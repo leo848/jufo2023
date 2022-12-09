@@ -36,3 +36,11 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+# Rust artifacts
+**/target/
+
+
+# Numpy data files and cache
+*.npy
+
