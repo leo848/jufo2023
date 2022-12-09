@@ -15,6 +15,7 @@ type Models = {
   "vertical-model": Model<StandardPositionalInput, FromToOutput>
   "ole-model": Model<StandardPositionalInput, FromToOutput>
   "complete-model": Model<StandardPositionalInput, CompleteOutput>
+  "3m-unique-rust-model": Model<StandardPositionalInput, CompleteOutput>
 }
 
 async function loadTfModel(name: string): Promise<LayersModel> {

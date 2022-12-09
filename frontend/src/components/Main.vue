@@ -36,7 +36,7 @@ export default {
     MoveDisplay,
   },
   created() {
-    loadModel("complete-model").then(m => this.model = m).then(this.update)
+    loadModel("3m-unique-rust-model").then(m => this.model = m).then(this.update)
   },
   data: () => ({
     message: 'Hello World!',
