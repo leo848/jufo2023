@@ -8,24 +8,39 @@ use std::{
     time::Instant,
 };
 
+use derive_more::IsVariant;
+use intersperse::intersperse_files;
 use itertools::Itertools;
 use npyz::WriterBuilder;
 use pgn_reader::{BufferedReader, SanPlus, Skip, Visitor};
 use rand::prelude::SliceRandom;
 use shakmaty::{Chess, Color, Move, Piece, Position, Square};
 
+mod intersperse;
+
 const MIN_ELO: u32 = 1500;
 const MIN_TIME: u32 = 300;
-const ONLY_COUNT: bool = true;
 
-const AMOUNT_OF_BOARDS: usize = 20_000_000;
-const BOARDS_PER_FILE: usize = 1_000_000;
-const AMOUNT_OF_FILES: usize = AMOUNT_OF_BOARDS / BOARDS_PER_FILE;
+const ACTION: Action = Action::OnlyCount;
 
-const NEURAL_INPUT_DIR: &str = "/tmp/20M_neural_input";
-const NEURAL_OUTPUT_DIR: &str = "/tmp/20M_neural_output";
+pub const AMOUNT_OF_BOARDS: usize = 20_000_000;
+pub const BOARDS_PER_FILE: usize = 1_000_000;
+pub const AMOUNT_OF_FILES: usize = AMOUNT_OF_BOARDS / BOARDS_PER_FILE;
+
+pub const INTERSPERSE_CHUNK_SIZE: usize = 1000;
+
+const NEURAL_INPUT_DIR: &str = "/../npy_files/20M_neural_input";
+const NEURAL_OUTPUT_DIR: &str = "/../npy_files/20M_neural_output";
 
 const PGN_FILE: &str = "database-2016-06.pgn";
+
+#[derive(Debug, Clone, Copy, IsVariant)]
+#[allow(dead_code)]
+enum Action {
+    OnlyCount,
+    PgnToNpy,
+    IntersperseNpys,
+}
 
 #[derive(Debug, Clone)]
 struct NeuralInputCreator {
@@ -114,6 +129,114 @@ impl Visitor for NeuralInputCreator {
 
 const INPUT_LENGTH: usize = 1 + (1 + 2 * 6) * 64;
 
+fn main() -> Result<(), Box<dyn Error>> {
+    if ACTION.is_intersperse_npys() {
+        return intersperse_files().into();
+    }
+
+    let pgn = File::open(PGN_FILE)?;
+
+    let mut reader = BufferedReader::new(&pgn);
+    let mut counter = NeuralInputCreator::new();
+
+    let io_pairs = std::iter::from_fn(|| reader.read_game(&mut counter).ok().flatten())
+        .flatten()
+        .flatten();
+
+    if ACTION.is_only_count() {
+        let count = io_pairs.count();
+        println!("{} games", count);
+    } else {
+        save_boards(io_pairs)?;
+    }
+
+    Ok(())
+}
+
+fn debug(start_time: Instant, count: usize) {
+    if count % 1024 == 0 && count != 0 {
+        let remaining = AMOUNT_OF_BOARDS - count;
+        let elapsed = start_time.elapsed();
+        let time_per_board = elapsed / count as u32;
+
+        let raw_eta = remaining as u32 * time_per_board;
+        // Format the eta as a HH:MM:SS string
+        let eta = format!(
+            "{}:{:02}:{:02}",
+            raw_eta.as_secs() / 3600,
+            (raw_eta.as_secs() % 3600) / 60,
+            raw_eta.as_secs() % 60
+        );
+        eprint!(
+            "{count} / {AMOUNT_OF_BOARDS} ({:.3}%) - {board_time:.4}ms per board - ETA: {eta}\r",
+            count as f32 * 100. / AMOUNT_OF_BOARDS as f32,
+            board_time = time_per_board.as_secs_f32() * 1000.0
+        );
+        stderr().flush().expect("Couldn't flush stdout");
+    }
+}
+
+fn save_boards(io_pairs: impl Iterator<Item = (Chess, Move)>) -> io::Result<()> {
+    if Path::new(NEURAL_INPUT_DIR).exists() || Path::new(NEURAL_INPUT_DIR).exists() {
+        assert!(NEURAL_INPUT_DIR != NEURAL_OUTPUT_DIR);
+        panic!("Directory already exists!");
+    }
+
+    for dir in &[NEURAL_INPUT_DIR, NEURAL_OUTPUT_DIR] {
+        create_dir(dir)?;
+    }
+
+    let io_pairs_chunked = io_pairs
+        .map(|(chess, r#move)| (chess_to_input(&chess), move_to_output(&r#move)))
+        .unique_by(|(input, _)| {
+            let mut hasher = DefaultHasher::new();
+            input.hash(&mut hasher);
+            hasher.finish()
+        })
+        .chunks(BOARDS_PER_FILE);
+
+    let start_time = Instant::now();
+
+    for (chunk_index, chunk) in io_pairs_chunked
+        .into_iter()
+        .take(AMOUNT_OF_FILES)
+        .enumerate()
+    {
+        let mut inputs = File::create(format!("{NEURAL_INPUT_DIR}/{chunk_index}.npy"))?;
+        let mut input_writer = {
+            npyz::WriteOptions::new()
+                .default_dtype()
+                .shape(&[BOARDS_PER_FILE as u64, INPUT_LENGTH as u64])
+                .writer(&mut inputs)
+                .begin_nd()?
+        };
+
+        let mut outputs = File::create(format!("{NEURAL_OUTPUT_DIR}/{chunk_index}.npy"))?;
+        let mut output_writer = {
+            npyz::WriteOptions::new()
+                .default_dtype()
+                .shape(&[BOARDS_PER_FILE as u64])
+                .writer(&mut outputs)
+                .begin_nd()?
+        };
+
+        chunk
+            .enumerate()
+            .for_each(|(board_index, (input, output))| {
+                // i is the index in the chunk, not the total index
+                // so we need to add the chunk index to it
+                debug(start_time, chunk_index * BOARDS_PER_FILE + board_index);
+                input_writer.extend(input).expect("IO error");
+                output_writer.push(&output).expect("IO error");
+            });
+
+        input_writer.finish()?;
+        output_writer.finish()?;
+    }
+
+    Ok(())
+}
+
 fn chess_to_input(chess: &Chess) -> [bool; INPUT_LENGTH] {
     let mut output = [false; INPUT_LENGTH];
 
@@ -159,104 +282,4 @@ fn move_to_output(m: &Move) -> u16 {
     let from: u8 = from.into();
     let to: u8 = to.into();
     from as u16 * 64 + to as u16
-}
-
-fn main() -> Result<(), Box<dyn Error>> {
-    let pgn = File::open(PGN_FILE)?;
-
-    let mut reader = BufferedReader::new(&pgn);
-    let mut counter = NeuralInputCreator::new();
-
-    let io_pairs = std::iter::from_fn(|| reader.read_game(&mut counter).ok().flatten())
-        .flatten()
-        .flatten();
-
-    if ONLY_COUNT {
-        let count = io_pairs.count();
-        println!("{} games", count);
-    } else {
-        save_boards(io_pairs)?;
-    }
-
-    Ok(())
-}
-
-fn debug(start_time: Instant, count: usize) {
-    if count % 1024 == 0 && count != 0 {
-        let remaining = AMOUNT_OF_BOARDS - count;
-        let elapsed = start_time.elapsed();
-        let time_per_board = elapsed / count as u32;
-
-        let raw_eta = remaining as u32 * time_per_board;
-        // Format the eta as a HH:MM:SS string
-        let eta = format!(
-            "{}:{:02}:{:02}",
-            raw_eta.as_secs() / 3600,
-            (raw_eta.as_secs() % 3600) / 60,
-            raw_eta.as_secs() % 60
-        );
-        eprint!(
-            "{count} / {AMOUNT_OF_BOARDS} ({:.3}%) - {board_time:.4}ms per board - ETA: {eta}\r",
-            count as f32 * 100. / AMOUNT_OF_BOARDS as f32,
-            board_time=time_per_board.as_secs_f32() * 1000.0
-        );
-        stderr().flush().expect("Couldn't flush stdout");
-    }
-}
-
-fn save_boards(io_pairs: impl Iterator<Item = (Chess, Move)>) -> io::Result<()> {
-    if Path::new(NEURAL_INPUT_DIR).exists() || Path::new(NEURAL_INPUT_DIR).exists() {
-        assert!(NEURAL_INPUT_DIR != NEURAL_OUTPUT_DIR);
-        panic!("Directory already exists!");
-    }
-
-    for dir in &[NEURAL_INPUT_DIR, NEURAL_OUTPUT_DIR] {
-        create_dir(dir)?;
-    }
-
-    let io_pairs_chunked = io_pairs
-            .map(|(chess, r#move)| (chess_to_input(&chess), move_to_output(&r#move)))
-            .unique_by(|(input, _)| {
-                let mut hasher = DefaultHasher::new();
-                input.hash(&mut hasher);
-                hasher.finish()
-            })
-            .chunks(BOARDS_PER_FILE);
-
-    let start_time = Instant::now();
-
-    for (chunk_index, chunk) in io_pairs_chunked.into_iter().take(AMOUNT_OF_FILES).enumerate() {
-        let mut inputs = File::create(format!("{NEURAL_INPUT_DIR}/{chunk_index}.npy"))?;
-        let mut input_writer = {
-            npyz::WriteOptions::new()
-                .default_dtype()
-                .shape(&[BOARDS_PER_FILE as u64, INPUT_LENGTH as u64])
-                .writer(&mut inputs)
-                .begin_nd()?
-        };
-
-        let mut outputs = File::create(format!("{NEURAL_OUTPUT_DIR}/{chunk_index}.npy"))?;
-        let mut output_writer = {
-            npyz::WriteOptions::new()
-                .default_dtype()
-                .shape(&[BOARDS_PER_FILE as u64])
-                .writer(&mut outputs)
-                .begin_nd()?
-        };
-
-        chunk
-            .enumerate()
-            .for_each(|(board_index, (input, output))| {
-                // i is the index in the chunk, not the total index
-                // so we need to add the chunk index to it
-                debug(start_time, chunk_index * BOARDS_PER_FILE + board_index);
-                input_writer.extend(input).expect("IO error");
-                output_writer.push(&output).expect("IO error");
-            });
-
-        input_writer.finish()?;
-        output_writer.finish()?;
-    }
-
-    Ok(())
 }

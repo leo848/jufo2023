@@ -42,6 +42,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "convert_case"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6245d59a3e82a7fc217c5828a6692dbc6dfb63a0c8c90495621f7b9d79704a0e"
+
+[[package]]
+name = "derive_more"
+version = "0.99.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4fb810d30a7c1953f91334de7244731fc3f3c10d7fe163338a35b9f640960321"
+dependencies = [
+ "convert_case",
+ "proc-macro2",
+ "quote",
+ "rustc_version",
+ "syn",
+]
+
+[[package]]
 name = "either"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -69,9 +88,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.137"
+version = "0.2.138"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc7fcc620a3bff7cdd7a365be3376c97191aeaccc2a603e600951e452615bf89"
+checksum = "db6d7e329c562c5dfab7a46a2afabc8b987ab9a4834c9d1ca04dc54c1546cef8"
 
 [[package]]
 name = "mach"
@@ -108,9 +127,9 @@ dependencies = [
 
 [[package]]
 name = "npyz"
-version = "0.7.1"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e78b548afbe32045d96e831b460df0d2da4813f24b2ab879111aacb3c63b881f"
+checksum = "56b807a25083fa096b44729824a2e89603ccacc758c30794d5d58acc9f88ec84"
 dependencies = [
  "byteorder",
  "nom",
@@ -141,6 +160,7 @@ dependencies = [
 name = "pgn-to-numpy"
 version = "0.1.0"
 dependencies = [
+ "derive_more",
  "itertools",
  "npyz",
  "pgn-reader",
@@ -153,6 +173,24 @@ name = "ppv-lite86"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
+
+[[package]]
+name = "proc-macro2"
+version = "1.0.47"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ea3d908b0e36316caf9e9e2c4625cdde190a7e6f440d794667ed17a1855e725"
+dependencies = [
+ "unicode-ident",
+]
+
+[[package]]
+name = "quote"
+version = "1.0.21"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbe448f377a7d6961e30f5955f9b8d106c3f5e449d493ee1b125c1d43c2b5179"
+dependencies = [
+ "proc-macro2",
+]
 
 [[package]]
 name = "rand"
@@ -185,6 +223,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustc_version"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bfa0f585226d2e68097d4f95d113b15b83a82e819ab25717ec0590d9584ef366"
+dependencies = [
+ "semver",
+]
+
+[[package]]
+name = "semver"
+version = "1.0.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e25dfac463d778e353db5be2449d1cce89bd6fd23c9f1ea21310ce6e5a1b29c4"
+
+[[package]]
 name = "shakmaty"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -205,6 +258,23 @@ dependencies = [
  "mach",
  "winapi",
 ]
+
+[[package]]
+name = "syn"
+version = "1.0.105"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "60b9b43d45702de4c839cb9b51d9f529c5dd26a4aff255b42b1ebc03e88ee908"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "unicode-ident",
+]
+
+[[package]]
+name = "unicode-ident"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ceab39d59e4c9499d4e5a8ee0e2735b891bb7308ac83dfb4e80cad195c9f6f3"
 
 [[package]]
 name = "wasi"
