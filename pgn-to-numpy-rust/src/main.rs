@@ -1,9 +1,9 @@
-#![warn(clippy::pedantic)]
-
 use std::{
+    collections::hash_map::DefaultHasher,
     error::Error,
-    fs::File,
-    io::{self, stdout, Write},
+    fs::{create_dir, File},
+    hash::{Hash, Hasher},
+    io::{self, stderr, Write},
     path::Path,
     time::Instant,
 };
@@ -16,12 +16,16 @@ use shakmaty::{Chess, Color, Move, Piece, Position, Square};
 
 const MIN_ELO: u32 = 1500;
 const MIN_TIME: u32 = 300;
-const ONLY_COUNT: bool = false;
+const ONLY_COUNT: bool = true;
 
-const AMOUNT_OF_BOARDS: usize = 3_000_000;
+const AMOUNT_OF_BOARDS: usize = 20_000_000;
+const BOARDS_PER_FILE: usize = 1_000_000;
+const AMOUNT_OF_FILES: usize = AMOUNT_OF_BOARDS / BOARDS_PER_FILE;
 
-const NEURAL_INPUT_FILE: &str = "3M_training_input.npy";
-const NEURAL_OUTPUT_FILE: &str = "3M_training_output.npy";
+const NEURAL_INPUT_DIR: &str = "/tmp/20M_neural_input";
+const NEURAL_OUTPUT_DIR: &str = "/tmp/20M_neural_output";
+
+const PGN_FILE: &str = "database-2016-06.pgn";
 
 #[derive(Debug, Clone)]
 struct NeuralInputCreator {
@@ -109,10 +113,11 @@ impl Visitor for NeuralInputCreator {
 }
 
 const INPUT_LENGTH: usize = 1 + (1 + 2 * 6) * 64;
+
 fn chess_to_input(chess: &Chess) -> [bool; INPUT_LENGTH] {
     let mut output = [false; INPUT_LENGTH];
 
-    output[0] = if chess.turn().is_white() { true } else { false };
+    output[0] = chess.turn().is_white();
 
     let board = chess.board().clone();
     for (index, square) in Square::ALL.into_iter().enumerate() {
@@ -133,13 +138,31 @@ fn chess_to_input(chess: &Chess) -> [bool; INPUT_LENGTH] {
 }
 
 fn move_to_output(m: &Move) -> u16 {
-    let from: u8 = m.from().unwrap().into();
-    let to: u8 = m.to().into();
+    let (from, to) = match m {
+        Move::Normal { from, to, .. } | Move::EnPassant { from, to, .. } => (*from, *to),
+        Move::Castle { king, rook } => {
+            let (king, king_to) = if king > rook {
+                (
+                    king,
+                    Square::from_coords(king.file().offset(-2).expect("Invalid rank"), king.rank()),
+                )
+            } else {
+                (
+                    king,
+                    Square::from_coords(king.file().offset(2).expect("Invalid rank"), king.rank()),
+                )
+            };
+            (*king, king_to)
+        }
+        Move::Put { .. } => unreachable!(),
+    };
+    let from: u8 = from.into();
+    let to: u8 = to.into();
     from as u16 * 64 + to as u16
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let pgn = File::open("database.pgn")?;
+    let pgn = File::open(PGN_FILE)?;
 
     let mut reader = BufferedReader::new(&pgn);
     let mut counter = NeuralInputCreator::new();
@@ -158,55 +181,82 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+fn debug(start_time: Instant, count: usize) {
+    if count % 1024 == 0 && count != 0 {
+        let remaining = AMOUNT_OF_BOARDS - count;
+        let elapsed = start_time.elapsed();
+        let time_per_board = elapsed / count as u32;
+
+        let raw_eta = remaining as u32 * time_per_board;
+        // Format the eta as a HH:MM:SS string
+        let eta = format!(
+            "{}:{:02}:{:02}",
+            raw_eta.as_secs() / 3600,
+            (raw_eta.as_secs() % 3600) / 60,
+            raw_eta.as_secs() % 60
+        );
+        eprint!(
+            "{count} / {AMOUNT_OF_BOARDS} ({:.3}%) - {board_time:.4}ms per board - ETA: {eta}\r",
+            count as f32 * 100. / AMOUNT_OF_BOARDS as f32,
+            board_time=time_per_board.as_secs_f32() * 1000.0
+        );
+        stderr().flush().expect("Couldn't flush stdout");
+    }
+}
+
 fn save_boards(io_pairs: impl Iterator<Item = (Chess, Move)>) -> io::Result<()> {
-    if Path::new(NEURAL_INPUT_FILE).exists() || Path::new(NEURAL_OUTPUT_FILE).exists() {
-        panic!("File already exists!");
+    if Path::new(NEURAL_INPUT_DIR).exists() || Path::new(NEURAL_INPUT_DIR).exists() {
+        assert!(NEURAL_INPUT_DIR != NEURAL_OUTPUT_DIR);
+        panic!("Directory already exists!");
     }
 
-    let mut inputs = File::create(NEURAL_INPUT_FILE)?;
-    let mut input_writer = {
-        npyz::WriteOptions::new()
-            .default_dtype()
-            .shape(&[AMOUNT_OF_BOARDS as u64, INPUT_LENGTH as u64])
-            .writer(&mut inputs)
-            .begin_nd()?
-    };
+    for dir in &[NEURAL_INPUT_DIR, NEURAL_OUTPUT_DIR] {
+        create_dir(dir)?;
+    }
 
-    let mut outputs = File::create(NEURAL_OUTPUT_FILE)?;
-    let mut output_writer = {
-        npyz::WriteOptions::new()
-            .default_dtype()
-            .shape(&[AMOUNT_OF_BOARDS as u64])
-            .writer(&mut outputs)
-            .begin_nd()?
-    };
+    let io_pairs_chunked = io_pairs
+            .map(|(chess, r#move)| (chess_to_input(&chess), move_to_output(&r#move)))
+            .unique_by(|(input, _)| {
+                let mut hasher = DefaultHasher::new();
+                input.hash(&mut hasher);
+                hasher.finish()
+            })
+            .chunks(BOARDS_PER_FILE);
 
     let start_time = Instant::now();
 
-    io_pairs
-        .map(|(chess, r#move)| (chess_to_input(&chess), move_to_output(&r#move)))
-        .unique_by(|(input, _)| *input)
-        .take(AMOUNT_OF_BOARDS)
-        .enumerate()
-        .inspect(|(i, _)| {
-            if *i % 1024 == 0 && *i != 0 {
-                let remaining = AMOUNT_OF_BOARDS - i;
-                let elapsed = start_time.elapsed();
-                let time_per_board = elapsed / *i as u32;
-                let eta = remaining as u32 * time_per_board;
-                print!(
-                    "{} / {} - {elapsed:?} - ETA: {eta:?} - {time_per_board:?} per board\r",
-                    i, AMOUNT_OF_BOARDS
-                );
-                stdout().flush().expect("Couldn't flush stdout");
-            }
-        })
-        .for_each(|(_, (input, output))| {
-            input_writer.extend(input).expect("IO error");
-            output_writer.push(&output).expect("IO error");
-        });
+    for (chunk_index, chunk) in io_pairs_chunked.into_iter().take(AMOUNT_OF_FILES).enumerate() {
+        let mut inputs = File::create(format!("{NEURAL_INPUT_DIR}/{chunk_index}.npy"))?;
+        let mut input_writer = {
+            npyz::WriteOptions::new()
+                .default_dtype()
+                .shape(&[BOARDS_PER_FILE as u64, INPUT_LENGTH as u64])
+                .writer(&mut inputs)
+                .begin_nd()?
+        };
 
-    input_writer.finish()?;
+        let mut outputs = File::create(format!("{NEURAL_OUTPUT_DIR}/{chunk_index}.npy"))?;
+        let mut output_writer = {
+            npyz::WriteOptions::new()
+                .default_dtype()
+                .shape(&[BOARDS_PER_FILE as u64])
+                .writer(&mut outputs)
+                .begin_nd()?
+        };
+
+        chunk
+            .enumerate()
+            .for_each(|(board_index, (input, output))| {
+                // i is the index in the chunk, not the total index
+                // so we need to add the chunk index to it
+                debug(start_time, chunk_index * BOARDS_PER_FILE + board_index);
+                input_writer.extend(input).expect("IO error");
+                output_writer.push(&output).expect("IO error");
+            });
+
+        input_writer.finish()?;
+        output_writer.finish()?;
+    }
 
     Ok(())
 }
