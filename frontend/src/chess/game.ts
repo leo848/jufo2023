@@ -25,6 +25,13 @@ export function move(move: string | {from: string; to: string; promotion?: strin
   }
 }
 
+export function resetGame() {
+  game.reset();
+  for (const event of Object.values(events)) {
+    event(game);
+  }
+}
+
 export function isSquare(str: string): str is Square {
   if (str.length !== 2) return false;
   const col = str.charAt(0);

@@ -4,12 +4,20 @@ type Settings = {
   theme: PieceTheme,
   onlyShowLegalMoves: boolean,
   showActivation: boolean,
+  autoPlay: {
+    black: boolean,
+    white: boolean,
+  }
 }
 
 const defaultSettings: Settings = {
   theme: "maestro",
   onlyShowLegalMoves: true,
   showActivation: true,
+  autoPlay: {
+    black: false,
+    white: false,
+  }
 } as const;
 
 let settings: Settings = { ...defaultSettings };

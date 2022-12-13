@@ -1,3 +1,4 @@
+import type {Square} from "chess.js";
 import { game } from "./game";
 
 // Declare the Chessboard. This is any because we don't have the type definitions for chessboard.js
@@ -7,7 +8,9 @@ export declare const Chessboard: {
 
 export function getMove(input: string | {from: string; to: string; promotion?: string | undefined;}) {
   if (typeof input !== "string") {
-    if (input.promotion === undefined) {
+    // If the input is a pawn promotion, set the promotion to 'q'.
+    const piece = game.get(input.from as Square);
+    if (piece && piece.type === "p" && (input.to[1] === "1" || input.to[1] === "8")) {
       input.promotion = "q";
     }
   }

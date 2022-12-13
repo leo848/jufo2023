@@ -7,7 +7,7 @@
       cols="6" sm="12"
     >
     <v-card
-      :color="move.inner ? actToColor(move.act) : gray"
+      :style="'background: ' + (move.inner ? actToColor(move.act) : gray)"
       :key="move.from + move.to + move.inner?.san"
       @click="move.inner && makeMove(move.inner)"
       max-width="300"
@@ -38,12 +38,12 @@ export default {
   name: "MoveDisplay",
   data: () => ({
     gray: "grey lighten-3",
-    interpolate: (t: number) => (x: number) =>
-      1 + 1 / t - 1 / (t * x + 1) - 1 / (t * t * x + t),
     showIndex: loadSetting("onlyShowLegalMoves"),
     showActivation: loadSetting("showActivation"),
   }),
   methods: {
+    interpolate: (t: number) => (x: number) =>
+      1 + 1 / t - 1 / (t * x + 1) - 1 / (t * t * x + t),
     makeMove(m: Move) {
       move(m);
     },
@@ -65,7 +65,11 @@ export default {
       let newAct = this.interpolate(25)(act);
       let red = Math.min(1.0, 2.0 - 2.0 * newAct) * 200;
       let green = Math.min(1.0, 2.0 * newAct) * 200;
-      return `rgb(${red}, ${green}, 0)`;
+      // return `rgb(${red}, ${green}, 0)`;
+
+      // Create a linear gradient with the calculated color on the left and a darker version on the right.
+      // The first color stop is at 75% and the second at 90%.
+      return `linear-gradient(90deg, rgb(${red}, ${green}, 0) 70%, rgb(${red * 0.7}, ${green * 0.7}, 0) 90%)`;
     },
   },
   props: {
