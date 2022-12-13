@@ -6,6 +6,11 @@ export declare const Chessboard: {
 };
 
 export function getMove(input: string | {from: string; to: string; promotion?: string | undefined;}) {
+  if (typeof input !== "string") {
+    if (input.promotion === undefined) {
+      input.promotion = "q";
+    }
+  }
   let move = game.move(input);
   if (move != null) game.undo();
   return move;
