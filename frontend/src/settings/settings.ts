@@ -3,11 +3,13 @@ import type { PieceTheme } from "../chess/loadPieces";
 type Settings = {
   theme: PieceTheme,
   onlyShowLegalMoves: boolean,
+  showActivation: boolean,
 }
 
 const defaultSettings: Settings = {
-  theme: "companion",
+  theme: "maestro",
   onlyShowLegalMoves: true,
+  showActivation: true,
 } as const;
 
 let settings: Settings = { ...defaultSettings };

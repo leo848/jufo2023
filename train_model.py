@@ -2,6 +2,7 @@ import gc
 import os
 
 import numpy as np
+import psutil
 
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -10,7 +11,7 @@ from tensorflow.keras import layers, models
 
 print("TensorFlow version: ", tf.__version__)
 
-MODEL_NAME = "models/unique-16M.h5"
+MODEL_NAME = "models/unique-16M-large.h5"
 
 if os.path.isfile(MODEL_NAME):
     print("Model already exists. Exiting.")
@@ -22,15 +23,13 @@ MODEL_OUTPUT = "npy_files/20M_neural_output/{n}.npy"
 
 TOTAL_DATA_SIZE = 16_000_000
 AMOUNT_OF_FILES = 16
-TRAINING_DATA_PERCENT = 0.95
-VALIDATION_DATA_PERCENT = 1 - TRAINING_DATA_PERCENT
 DATA_PER_FILE = TOTAL_DATA_SIZE // AMOUNT_OF_FILES
 
 TRAINING_DATA_SIZE = (0, 15)
 VALIDATION_DATA_SIZE = (15, 16)
 
 BATCH_SIZE = 100
-EPOCHS = 150
+EPOCHS = 75
 
 TRAINING_STEPS = (TRAINING_DATA_SIZE[1] - TRAINING_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS
 VALIDATION_STEPS = (VALIDATION_DATA_SIZE[1] - VALIDATION_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS
@@ -39,14 +38,19 @@ VALIDATION_STEPS = (VALIDATION_DATA_SIZE[1] - VALIDATION_DATA_SIZE[0]) * DATA_PE
 def generator_generator(start: int, end: int):
     def generator():
         for i in range(start, end):
-            x = np.load(MODEL_INPUT.format(n=i), mmap_mode="r")
-            y = np.load(MODEL_OUTPUT.format(n=i), mmap_mode="r")
+            x = np.load(MODEL_INPUT.format(n=i))
+            y = np.load(MODEL_OUTPUT.format(n=i))
             for i in range(0, x.shape[0], BATCH_SIZE):
                 x_batch, y_batch = x[i:i+BATCH_SIZE], y[i:i+BATCH_SIZE]
                 y_batch = tf.keras.utils.to_categorical(y_batch, num_classes=4096)
 
                 yield x_batch, y_batch
-            gc.collect()
+
+            del x, y
+            print(f"\nFile {i} done. Free memory: {psutil.virtual_memory().available / 1024 / 1024 / 1024:.2f} GB")
+            print(f"Sweeping {gc.collect()} objects")
+            print("Free memory: ", psutil.virtual_memory().available / 1024 / 1024 / 1024, "GB")
+
     return generator
 
 training_generator = generator_generator(*TRAINING_DATA_SIZE)
@@ -74,16 +78,16 @@ history = model.fit(
     validation_steps=VALIDATION_STEPS,
 )
 
-accuracy = history.history['accuracy']
-val_accuracy = history.history['val_accuracy']
-epochs = range(1, len(accuracy) + 1)
-plt.plot(epochs, accuracy, 'bo', label='Training accuracy')
-plt.plot(epochs, val_accuracy, 'b', label='Validation accuracy')
-plt.title('Training and validation accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.show()
+# accuracy = history.history['accuracy']
+# val_accuracy = history.history['val_accuracy']
+# epochs = range(1, len(accuracy) + 1)
+# plt.plot(epochs, accuracy, 'bo', label='Training accuracy')
+# plt.plot(epochs, val_accuracy, 'b', label='Validation accuracy')
+# plt.title('Training and validation accuracy')
+# plt.xlabel('Epochs')
+# plt.ylabel('Accuracy')
+# plt.legend()
+# plt.show()
 
 # Save the model
 if input("Save model? [y/N] ").lower() == "y":

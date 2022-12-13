@@ -20,6 +20,13 @@
               label="Only show legal moves"
               />
           </v-col>
+          <v-col cols="12" md="6">
+            <v-switch
+              v-model="settings.showActivation"
+              color="primary"
+              label="Show neural activation"
+              />
+          </v-col>
         </v-row>
       </v-container>
     </v-card-text>
