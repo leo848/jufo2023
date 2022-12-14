@@ -5,7 +5,7 @@
         <p class="text-h2 mb-4 font-weight-bold" v-html="result" />
         <p class="mb-2" v-html="winPieceIcons" />
         <p class="text-h5 mb-4">Reason: {{ status.reason }}</p>
-        <v-card color="brown" @click="showPgn = !showPgn">
+        <v-card :color="showPgn ? null : 'brown'" @click="showPgn = !showPgn">
           <v-card-title>PGN</v-card-title>
           <v-slide-y-transition>
             <v-card-text v-show="showPgn">
