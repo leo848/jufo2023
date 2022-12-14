@@ -5,13 +5,18 @@
         <div ref="board"></div>
       </v-col>
       <v-col cols="12" sm="6" lg="4">
-        <MoveDisplay v-if="model" :moves="moves" />
-        <v-card v-else max-width="300px">
-          <v-card-title>Loading model...</v-card-title>
-          <v-card-text>
-            <v-progress-circular :size="50" :width="6" indeterminate />
-          </v-card-text>
-        </v-card>
+        <div v-if="gameOver">
+          <GameOver />
+        </div>
+        <div v-else>
+          <MoveDisplay v-if="model && !gameOver" :moves="moves" />
+          <v-card v-else-if="!gameOver" max-width="300px">
+            <v-card-title>Loading model...</v-card-title>
+            <v-card-text>
+              <v-progress-circular :size="50" :width="6" indeterminate />
+            </v-card-text>
+          </v-card>
+        </div>
       </v-col>
     </v-row>
   </div>
@@ -35,12 +40,13 @@ import { getMove } from "@/chess/boardHandlers";
 import { loadPiece } from "@/chess/loadPieces";
 
 import MoveDisplay from "@/components/MoveDisplay.vue";
+import GameOver from "@/components/GameOver.vue";
 import type { Chess, Move } from "chess.js";
 import { loadSetting } from "@/settings/settings";
 
 export default {
   components: {
-    MoveDisplay,
+    MoveDisplay, GameOver,
   },
   created() {
     loadModel("15m-unique-model")
@@ -54,6 +60,7 @@ export default {
     moves: [] as MoveWithAct[],
     board: null as any | null,
     autoPlay: loadSetting("autoPlay"),
+    gameOver: false,
   }),
   mounted() {
     this.board = (window["Chessboard" as any] as any)(this.$refs.board, {
@@ -145,7 +152,40 @@ export default {
           }
         })
       }
+      if (game.isGameOver()) {
+        this.gameOver = true;
+        console.log("Game over!");
+      }
     },
   },
 };
 </script>
+
+<style>
+.piece-letter {
+  height: 1.5em;
+  width: 1.5em;
+  margin-top: 0.25em;
+  transform: scale(1.5);
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+
+.moves-move,
+.moves-enter-active,
+.moves-leave-active {
+  transition: all 0.25s ease;
+}
+.moves-enter-from,
+.moves-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.moves-leave-active {
+  position: absolute;
+  z-index: -1;
+}
+
+
+</style>

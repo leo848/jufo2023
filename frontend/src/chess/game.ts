@@ -18,6 +18,10 @@ export function removeEvent(id: number) {
   delete events[id];
 }
 
+export function runEvent(id: number) {
+  events[id](game);
+}
+
 export function move(move: string | {from: string; to: string; promotion?: string | undefined;}) {
   game.move(move);
   for (const event of Object.values(events)) {

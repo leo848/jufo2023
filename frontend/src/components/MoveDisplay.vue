@@ -85,32 +85,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.piece-letter {
-  height: 1.5em;
-  width: 1.5em;
-  margin-top: 0.25em;
-  transform: scale(1.5);
-  margin-left: 0.5em;
-  margin-right: 0.5em;
-}
-
-.moves-move,
-.moves-enter-active,
-.moves-leave-active {
-  transition: all 0.25s ease;
-}
-.moves-enter-from,
-.moves-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.moves-leave-active {
-  position: absolute;
-  z-index: -1;
-}
-
-
-</style>

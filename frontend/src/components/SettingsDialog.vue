@@ -18,7 +18,7 @@
               v-model="settings.onlyShowLegalMoves"
               color="primary"
               label="Only show legal moves"
-              density="dense"
+              density="compact"
               />
           </v-col>
           <v-col cols="12" md="6">
@@ -26,7 +26,7 @@
               v-model="settings.showActivation"
               color="primary"
               label="Show neural activation"
-              density="dense"
+              density="compact"
               />
           </v-col>
           <v-col cols="12" md="6">
@@ -34,7 +34,7 @@
               v-model="settings.autoPlay.black"
               color="primary"
               label="Auto play black"
-              density="dense"
+              density="compact"
               />
           </v-col>
           <v-col cols="12" md="6">
@@ -42,7 +42,7 @@
               v-model="settings.autoPlay.white"
               color="primary"
               label="Auto play white"
-              density="dense"
+              density="compact"
               />
           </v-col>
         </v-row>
