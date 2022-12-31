@@ -6,7 +6,7 @@
       </v-col>
       <v-col cols="12" sm="6" lg="4">
         <div v-if="gameOver">
-          <GameOver />
+          <GameOver @new="newGame" />
         </div>
         <div v-else>
           <MoveDisplay v-if="model && !gameOver" :moves="moves" />
@@ -157,6 +157,9 @@ export default {
         console.log("Game over!");
       }
     },
+    newGame() {
+      this.gameOver = false;
+    }
   },
 };
 </script>

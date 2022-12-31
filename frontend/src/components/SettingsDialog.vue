@@ -7,11 +7,18 @@
           <v-col cols="12">
             <v-menu v-model="pieceThemeMenu" :close-on-content-click="false">
               <template v-slot:activator="{ props }">
-                <v-btn v-bind="props" class="mr-4" color="primary">{{ settings.theme }}</v-btn>
+                <v-btn v-bind="props" class="mr-4" color="primary">{{
+                  settings.theme
+                }}</v-btn>
               </template>
-              <ChooseTheme @select="selectTheme"/>
+              <ChooseTheme @select="selectTheme" />
             </v-menu>
-            <span>by {{ license.by }} <span v-if="license.license">under {{ license.license }}</span></span>
+            <span
+              >by {{ license.by }}
+              <span v-if="license.license"
+                >under {{ license.license }}</span
+              ></span
+            >
           </v-col>
           <v-col cols="12" md="6">
             <v-switch
@@ -19,7 +26,7 @@
               color="primary"
               label="Only show legal moves"
               density="compact"
-              />
+            />
           </v-col>
           <v-col cols="12" md="6">
             <v-switch
@@ -27,23 +34,16 @@
               color="primary"
               label="Show neural activation"
               density="compact"
-              />
+            />
           </v-col>
           <v-col cols="12" md="6">
-            <v-switch
-              v-model="settings.autoPlay.black"
-              color="primary"
-              label="Auto play black"
-              density="compact"
-              />
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-switch
-              v-model="settings.autoPlay.white"
-              color="primary"
-              label="Auto play white"
-              density="compact"
-              />
+            <p class="mb-2">Play automatically for:</p>
+            <v-btn @click="settings.autoPlay.white = !settings.autoPlay.white" :color="settings.autoPlay.white ? 'primary' : null" class="mr-4" icon size="x-large">
+              <img :src="loadPiece('wK')" class="button-piece"/>
+            </v-btn>
+            <v-btn @click="settings.autoPlay.black = !settings.autoPlay.black" :color="settings.autoPlay.black ? 'primary' : null" icon size="x-large">
+              <img :src="loadPiece('bK')" class="button-piece"/>
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -58,10 +58,10 @@
 </template>
 
 <script lang="ts">
-import { loadSettings, saveSettings } from '@/settings/settings';
-import { themes, themesLicenses, type PieceTheme } from '@/chess/loadPieces';
+import { loadSettings, saveSettings } from "@/settings/settings";
+import { loadPiece, themes, themesLicenses, type PieceTheme } from "@/chess/loadPieces";
 
-import ChooseTheme from '@/components/ChooseTheme.vue';
+import ChooseTheme from "@/components/ChooseTheme.vue";
 
 export default {
   components: { ChooseTheme },
@@ -73,17 +73,25 @@ export default {
   computed: {
     license() {
       return themesLicenses[this.settings.theme];
-    }
+    },
   },
   methods: {
     save() {
       saveSettings(this.settings);
-      this.$emit('close');
+      this.$emit("close");
     },
     selectTheme(theme: PieceTheme) {
       this.settings.theme = theme;
       this.pieceThemeMenu = false;
     },
+    loadPiece,
   },
-}
+};
 </script>
+
+<style>
+.button-piece {
+  height: 80%;
+  width: 80%;
+}
+</style>
