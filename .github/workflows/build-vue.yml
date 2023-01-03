@@ -4,16 +4,14 @@ jobs:
   build-vue:
     runs-on: ubuntu-latest
     name: Build Vue
-    defaults:
-      run:
-        working-directory: ./frontend
     steps:
     - uses: actions/checkout@v2
     - id: Build-Vue
-      uses: xRealNeon/VuePagesAction@1.0.0
+      uses: leo848/VuePagesAction@1.0.0
       with:
         username: 'leo848'
         reponame: 'jufo2023'
         token: ${{ secrets.GITHUB_TOKEN }}
         gitname: Vue Builder
         gitmsg: Build Vue
+        working-directory: './frontend'
