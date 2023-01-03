@@ -7,7 +7,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - id: Build-Vue
-      uses: leo848/VuePagesAction@1.0.0
+      uses: leo848/VuePagesAction
       with:
         username: 'leo848'
         reponame: 'jufo2023'
