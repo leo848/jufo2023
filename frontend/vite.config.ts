@@ -17,5 +17,5 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-  base: 'jufo2023',
+  base: '/jufo2023/',
 });
