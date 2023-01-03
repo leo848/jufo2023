@@ -42,7 +42,7 @@ import { loadPiece } from "@/chess/loadPieces";
 import MoveDisplay from "@/components/MoveDisplay.vue";
 import GameOver from "@/components/GameOver.vue";
 import type { Chess, Move } from "chess.js";
-import { loadSetting } from "@/settings/settings";
+import { loadSetting, loadSettings } from "@/settings/settings";
 
 export default {
   components: {
@@ -121,10 +121,12 @@ export default {
       if (this.model === null) return;
       const input = game.fen();
       const output = this.model.predict(fenToStandardPositionalInput(input));
+
+      const { maxMoves, onlyShowLegalMoves } = loadSettings();
+
       let amount = 10;
       let moves: (MoveWithAct & { inner: null | Move; index: number })[] = [];
-      const onlyShowLegalMoves = loadSetting("onlyShowLegalMoves");
-      while (moves.length < 8 && amount <= 10000) {
+      while (moves.length < maxMoves && amount <= 10000) {
         moves = completeOutputToMoves(output, { amount })
           .map((obj, index) => ({
             ...obj,
@@ -132,7 +134,7 @@ export default {
             index: index + 1,
           }))
           .filter((obj) => !onlyShowLegalMoves || obj.inner !== null)
-          .slice(0, 8);
+          .slice(0, maxMoves);
         amount *= 10;
       }
       this.moves = moves;

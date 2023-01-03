@@ -4,6 +4,7 @@ type Settings = {
   theme: PieceTheme,
   onlyShowLegalMoves: boolean,
   showActivation: boolean,
+  maxMoves: number,
   autoPlay: {
     black: boolean,
     white: boolean,
@@ -14,6 +15,7 @@ const defaultSettings: Settings = {
   theme: "maestro",
   onlyShowLegalMoves: true,
   showActivation: true,
+  maxMoves: 8,
   autoPlay: {
     black: false,
     white: false,

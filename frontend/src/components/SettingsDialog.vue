@@ -36,6 +36,20 @@
               density="compact"
             />
           </v-col>
+          <v-col cols="12">
+            <v-slider v-model="settings.maxMoves" :min="1" :max="20" :step="1" thumb-label label="Max moves shown">
+              <template v-slot:append>
+                <v-text-field
+                  v-model="settings.maxMoves"
+                  hide-details
+                  single-line
+                  density="compact"
+                  type="number"
+                  style="width: 70px"
+                  ></v-text-field>
+              </template>
+            </v-slider>
+          </v-col>
           <v-col cols="12" md="6">
             <p class="mb-2">Play automatically for:</p>
             <v-btn @click="settings.autoPlay.white = !settings.autoPlay.white" :color="settings.autoPlay.white ? 'primary' : null" class="mr-4" icon size="x-large">
