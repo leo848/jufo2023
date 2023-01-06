@@ -133,8 +133,7 @@ export default {
             inner: getMove(obj),
             index: index + 1,
           }))
-          .filter((obj) => !onlyShowLegalMoves || obj.inner !== null)
-          .slice(0, maxMoves);
+          .filter((obj) => !onlyShowLegalMoves || obj.inner !== null);
         amount *= 10;
       }
       this.moves = moves;
@@ -146,7 +145,11 @@ export default {
           (this.autoPlay.white && currentColor === "w"))
       ) {
         requestAnimationFrame(() => {
-          const move = moves[0];
+          let move = null;
+          let counter = 0;
+          while (move?.inner == null) {
+            move = moves[counter++];
+          }
           if (move.inner !== null) {
             game.move(move.inner);
             this.board.position(game.fen());

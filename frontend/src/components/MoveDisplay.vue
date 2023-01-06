@@ -2,7 +2,7 @@
   <v-row>
     <transition-group name="moves">
     <v-col
-      v-for="move in moves"
+      v-for="move in computedMoves"
       :key="move.from + move.to + move.inner?.san"
       cols="6" sm="12"
     >
@@ -41,6 +41,12 @@ export default {
     showIndex: loadSetting("onlyShowLegalMoves"),
     showActivation: loadSetting("showActivation"),
   }),
+  computed: {
+    computedMoves() {
+      let maxMoves = loadSetting("maxMoves");
+      return this.moves.slice(0, maxMoves);
+    }
+  },
   methods: {
     interpolate: (t: number) => (x: number) =>
       1 + 1 / t - 1 / (t * x + 1) - 1 / (t * t * x + t),
