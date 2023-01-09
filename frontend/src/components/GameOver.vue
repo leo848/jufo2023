@@ -1,10 +1,10 @@
 <template>
   <v-card>
-    <v-card-title class="text-h5">Game over!</v-card-title>
+    <v-card-title class="text-h5">{{ gameOverString() }}</v-card-title>
     <v-card-text class="mt-4 mb-4">
       <p class="text-h2 mb-4 font-weight-bold" v-html="result" />
       <p class="mb-2" v-html="winPieceIcons" />
-      <p class="text-h5 mb-4">Reason: {{ translateReason(status.reason) }}</p>
+      <p class="text-h5 mb-4">Grund: {{ translateReason(status.reason) }}</p>
       <v-card :color="showPgn ? null : 'brown'" @click="showPgn = !showPgn">
         <v-card-title>PGN</v-card-title>
         <v-slide-y-transition>
@@ -21,7 +21,7 @@
           </v-card-text>
         </v-slide-y-transition>
       </v-card>
-      <v-btn size="x-large" class="mt-6 rainbow-btn" @click="newGame"> New game </v-btn>
+      <v-btn size="x-large" class="mt-6 rainbow-btn" @click="newGame">Neues Spiel</v-btn>
     </v-card-text>
   </v-card>
 </template>
@@ -79,7 +79,7 @@ export default {
       } else {
         strings.push("Unentschieden!", "Remis!");
       }
-
+      return strings[Math.random() * strings.length | 0]
     },
     translateReason,
   },
