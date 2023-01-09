@@ -1,14 +1,14 @@
 <template>
   <v-app>
     <v-app-bar ref="app-bar" app floating>
-      <v-app-bar-title>Chess using neural networks</v-app-bar-title>
+      <v-app-bar-title>Kann Künstliche Intelligenz Schach lernen?</v-app-bar-title>
       <v-spacer></v-spacer>
       <v-btn icon>
         <v-icon>mdi-cog</v-icon>
         <v-dialog
           v-model="dialog"
           activator="parent"
-          max-width="600px"
+          max-width="800px"
           >
           <SettingsDialog @close="newSettings" />
         </v-dialog>

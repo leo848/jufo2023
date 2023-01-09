@@ -1,6 +1,6 @@
 <template>
   <v-card min-height="200px">
-    <v-card-title class="text-h5">Settings</v-card-title>
+    <v-card-title class="text-h5">Einstellungen</v-card-title>
     <v-card-text>
       <v-container>
         <v-row>
@@ -14,9 +14,9 @@
               <ChooseTheme @select="selectTheme" />
             </v-menu>
             <span
-              >by {{ license.by }}
+              >von {{ license.by }}
               <span v-if="license.license"
-                >under {{ license.license }}</span
+                >, lizenziert unter {{ license.license }}</span
               ></span
             >
           </v-col>
@@ -24,7 +24,7 @@
             <v-switch
               v-model="settings.onlyShowLegalMoves"
               color="primary"
-              label="Only show legal moves"
+              label="Nur legale Züge anzeigen"
               density="compact"
             />
           </v-col>
@@ -32,12 +32,12 @@
             <v-switch
               v-model="settings.showActivation"
               color="primary"
-              label="Show neural activation"
+              label="Neuronale Aktivierung zeigen"
               density="compact"
             />
           </v-col>
           <v-col cols="12">
-            <v-slider v-model="settings.maxMoves" :min="1" :max="20" :step="1" thumb-label label="Max moves shown">
+            <v-slider v-model="settings.maxMoves" :min="1" :max="20" :step="1" thumb-label label="Maximale angezeigte Züge">
               <template v-slot:append>
                 <v-text-field
                   v-model="settings.maxMoves"
@@ -51,7 +51,8 @@
             </v-slider>
           </v-col>
           <v-col cols="12" md="6">
-            <p class="mb-2">Play automatically for:</p>
+            <p class="mb-2">Automatisch spielen für:</p>
+
             <v-btn @click="settings.autoPlay.white = !settings.autoPlay.white" :color="settings.autoPlay.white ? 'primary' : null" class="mr-4" icon size="x-large">
               <img :src="loadPiece('wK')" class="button-piece"/>
             </v-btn>
@@ -65,8 +66,8 @@
     <v-spacer />
     <v-card-actions>
       <v-spacer />
-      <v-btn @click="$emit('close')">Cancel</v-btn>
-      <v-btn @click="save" variant="tonal" color="primary">Save</v-btn>
+      <v-btn @click="$emit('close')">Abbrechen</v-btn>
+      <v-btn @click="save" variant="tonal" color="primary">Speichern</v-btn>
     </v-card-actions>
   </v-card>
 </template>

@@ -4,7 +4,7 @@
     <v-card-text class="mt-4 mb-4">
       <p class="text-h2 mb-4 font-weight-bold" v-html="result" />
       <p class="mb-2" v-html="winPieceIcons" />
-      <p class="text-h5 mb-4">Reason: {{ status.reason }}</p>
+      <p class="text-h5 mb-4">Reason: {{ translateReason(status.reason) }}</p>
       <v-card :color="showPgn ? null : 'brown'" @click="showPgn = !showPgn">
         <v-card-title>PGN</v-card-title>
         <v-slide-y-transition>
@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import { game, resetGame } from "@/chess/game";
-import { getStatus } from "@/chess/status";
+import { getStatus, translateReason } from "@/chess/status";
 import { loadPiece } from "@/chess/loadPieces";
 
 export default {
@@ -69,7 +69,19 @@ export default {
     newGame() {
       resetGame();
       this.$emit("new");
-    }
+    },
+    gameOverString() {
+      const strings = ["Game over", "Spiel vorbei!"];
+      if (this.status.result === "0-1") {
+        strings.push("Schwarz gewinnt!", "Sieg für Schwarz!");
+      } else if (this.status.result === "1-0") {
+        strings.push("Weiß gewinnt!", "Sieg für Weiß!");
+      } else {
+        strings.push("Unentschieden!", "Remis!");
+      }
+
+    },
+    translateReason,
   },
   emits: [ "new" ]
 };
