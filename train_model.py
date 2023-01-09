@@ -11,7 +11,7 @@ from tensorflow.keras import layers, models
 
 print("TensorFlow version: ", tf.__version__)
 
-MODEL_NAME = "models/unique-16M-large.h5"
+MODEL_NAME = "models/unique-15Mtrain-256-5layers.h5"
 
 if os.path.isfile(MODEL_NAME):
     print("Model already exists. Exiting.")
@@ -31,8 +31,8 @@ VALIDATION_DATA_SIZE = (15, 16)
 BATCH_SIZE = 100
 EPOCHS = 75
 
-TRAINING_STEPS = (TRAINING_DATA_SIZE[1] - TRAINING_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS
-VALIDATION_STEPS = (VALIDATION_DATA_SIZE[1] - VALIDATION_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS
+TRAINING_STEPS = (TRAINING_DATA_SIZE[1] - TRAINING_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
+VALIDATION_STEPS = (VALIDATION_DATA_SIZE[1] - VALIDATION_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
 
 
 def generator_generator(start: int, end: int):
@@ -47,9 +47,6 @@ def generator_generator(start: int, end: int):
                 yield x_batch, y_batch
 
             del x, y
-            print(f"\nFile {i} done. Free memory: {psutil.virtual_memory().available / 1024 / 1024 / 1024:.2f} GB")
-            print(f"Sweeping {gc.collect()} objects")
-            print("Free memory: ", psutil.virtual_memory().available / 1024 / 1024 / 1024, "GB")
 
     return generator
 
@@ -58,6 +55,7 @@ validation_generator = generator_generator(*VALIDATION_DATA_SIZE)
 
 model = models.Sequential()
 model.add(layers.Dense(256, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
+model.add(layers.Dense(256, activation='relu'))
 model.add(layers.Dense(256, activation='relu'))
 model.add(layers.Dense(256, activation='relu'))
 model.add(layers.Dense(256, activation='relu'))
@@ -78,16 +76,16 @@ history = model.fit(
     validation_steps=VALIDATION_STEPS,
 )
 
-# accuracy = history.history['accuracy']
-# val_accuracy = history.history['val_accuracy']
-# epochs = range(1, len(accuracy) + 1)
-# plt.plot(epochs, accuracy, 'bo', label='Training accuracy')
-# plt.plot(epochs, val_accuracy, 'b', label='Validation accuracy')
-# plt.title('Training and validation accuracy')
-# plt.xlabel('Epochs')
-# plt.ylabel('Accuracy')
-# plt.legend()
-# plt.show()
+accuracy = history.history['accuracy']
+val_accuracy = history.history['val_accuracy']
+epochs = range(1, len(accuracy) + 1)
+plt.plot(epochs, accuracy, 'bo', label='Training accuracy')
+plt.plot(epochs, val_accuracy, 'b', label='Validation accuracy')
+plt.title('Training and validation accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
 
 # Save the model
 if input("Save model? [y/N] ").lower() == "y":

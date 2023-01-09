@@ -127,7 +127,7 @@ export default {
       let amount = 10;
       let moves: (MoveWithAct & { inner: null | Move; index: number })[] = [];
       while (moves.length < maxMoves && amount <= 10000) {
-        moves = completeOutputToMoves(output, { amount })
+        moves = completeOutputToMoves(output).slice(0, amount)
           .map((obj, index) => ({
             ...obj,
             inner: getMove(obj),

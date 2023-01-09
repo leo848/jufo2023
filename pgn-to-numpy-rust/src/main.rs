@@ -105,7 +105,7 @@ impl Visitor for NeuralInputCreator {
                 self.board.play_unchecked(&m);
             }
             Err(e) => {
-                println!("Error: {}", e);
+                eprintln!("Error: {}", e);
             }
         }
     }
@@ -118,8 +118,9 @@ impl Visitor for NeuralInputCreator {
         if !self.considerable_game {
             return None;
         }
+        let rng = rand::thread_rng();
         self.moves
-            .choose_multiple(&mut rand::thread_rng(), 10)
+            .choose_multiple(&mut rng, 10)
             .cloned()
             .collect_vec()
             .try_into()
