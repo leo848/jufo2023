@@ -55,3 +55,7 @@ export default {
   background: linear-gradient(to right, #872A97, #3F51B5);
 }
 </style>
+
+<style lang="sass">
+@import '../node_modules/@fontsource/roboto/index.css'
+</style>

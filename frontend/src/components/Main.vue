@@ -49,7 +49,7 @@ export default {
     MoveDisplay, GameOver,
   },
   created() {
-    loadModel("15m-unique-model")
+    loadModel("15mtrain-512neurons-4layers")
       .then((m) => (this.model = m))
       .then(this.update);
   },
