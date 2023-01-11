@@ -2,7 +2,7 @@
   <div>
     <v-row>
       <v-col cols="12" sm="6" lg="4">
-        <div ref="board"></div>
+        <div ref="board" id="chessground-main"></div>
       </v-col>
       <v-col cols="12" sm="6" lg="4">
         <div v-if="gameOver">
@@ -44,9 +44,14 @@ import GameOver from "@/components/GameOver.vue";
 import type { Chess, Move } from "chess.js";
 import { loadSetting, loadSettings } from "@/settings/settings";
 
+import { Chessground } from "chessground";
+import type { Api } from "chessground/api";
+import type { Key, Role } from "chessground/types";
+
 export default {
   components: {
-    MoveDisplay, GameOver,
+    MoveDisplay,
+    GameOver,
   },
   created() {
     loadModel("15mtrain-512neurons-4layers")
@@ -58,66 +63,105 @@ export default {
     event: 0,
     model: null as Model<StandardPositionalInput, CompleteOutput> | null,
     moves: [] as MoveWithAct[],
-    board: null as any | null,
+    board: null as Api | null,
     autoPlay: loadSetting("autoPlay"),
     gameOver: false,
   }),
   mounted() {
-    this.board = (window["Chessboard" as any] as any)(this.$refs.board, {
-      draggable: true,
-      dropOffBoard: "trash",
-      position: "start",
-      pieceTheme: this.pieceTheme,
-      onDrop: this.onDrop,
-      onDragStart: this.onDragStart,
-      onSnapEnd: this.onSnapEnd,
-    });
+    // The chess start fen, expressed in Forsyth–Edwards Notation
+    const config = {
+      autoCastle: true,
+      movable: {
+        free: false,
+      },
+      events: {
+        move: (orig: Key, dest: Key) => {
+          if (this.gameOver) return;
+          const move = getMove({ from: orig, to: dest });
+          if (move) {
+            game.move(move);
+            this.update();
+          }
+        },
+      },
+      highlight: {
+        lastMove: true,
+        check: true,
+      },
+      animation: {
+        enabled: true,
+        duration: 500,
+      },
+    };
+
+    if (!(this.$refs.board instanceof HTMLElement))
+      throw new Error("Board ref is not an HTMLElement");
+
+    this.board = Chessground(this.$refs.board, config);
+
     this.event = addEvent((game: Chess) => {
-      this.board.position(game.fen());
+      this.board!.set({
+        fen: game.fen(),
+      });
       this.update();
     });
 
-    (this.$refs.board as HTMLElement).addEventListener(
-      "scroll touchmove touchend touchstart contextmenu",
-      (e) => {
-        alert(e);
-        e.preventDefault();
+    // Create a DOM <style> element, styling every chess piece with the setting
+
+    const style = document.createElement("style");
+    style.id = "pieceStyle";
+    const pieceTheme = loadSetting("theme");
+
+    // For every role in the type Role:
+
+    for (const [role, shortRole] of [["pawn", "P"], ["knight", "N"], ["bishop", "B"], ["rook", "R"], ["queen", "Q"], ["king", "K"]]) {
+      for (const [color, shortColor] of [["white", "w"], ["black", "b"]]) {
+        const piece = loadPiece(`${shortColor}${shortRole}`, pieceTheme);
+        style.innerHTML += `.cg-wrap piece.${role}.${color} { background-image: url("${piece}"); }`;
       }
-    );
+    }
+
+    document.head.appendChild(style);
   },
   beforeUnmount() {
     removeEvent(this.event);
+
+    const style = document.getElementById("pieceStyle");
+    if (style) style.remove();
   },
   methods: {
     pieceTheme(piece: string) {
       return loadPiece(piece);
     },
-    onDragStart(
-      source: string,
-      piece: string,
-      _position: string,
-      _orientation: string
-    ) {
-      if (!isSquare(source)) throw new Error("source isn't square");
-      if (game.isGameOver()) return false;
-      if (game.turn() === "w" && piece.search(/^b/) !== -1) return false;
-      if (game.turn() === "b" && piece.search(/^w/) !== -1) return false;
-      if (game.moves({ square: source }).length === 0) return false;
-    },
-    onDrop(source: string, target: string) {
-      let move = game.move({
-        from: source,
-        to: target,
-      });
-
-      if (move === null) return "snapback";
-
-      this.update();
-    },
-    onSnapEnd() {
-      this.board.position(game.fen());
-    },
     update() {
+      const destinations: Map<Key, Key[]> = new Map();
+      for (const move of game.moves({ verbose: true })) {
+        if (typeof move === "string") throw new Error("move is string");
+        if (destinations.get(move.from as Key) === undefined) {
+          destinations.set(move.from as Key, []);
+        }
+        destinations.get(move.from as Key)!.push(move.to as Key);
+      }
+
+      const newConfig = {
+        fen: game.fen(),
+        movable: {
+          free: false,
+          dests: destinations,
+        },
+      };
+
+      this.board!.set(newConfig);
+
+      this.updateMoves();
+
+      if (game.isGameOver())
+        setTimeout(() => {
+          this.gameOver = true;
+        }, 100);
+    },
+
+    updateMoves() {
       if (this.model === null) return;
       const input = game.fen();
       const output = this.model.predict(fenToStandardPositionalInput(input));
@@ -127,7 +171,8 @@ export default {
       let amount = 10;
       let moves: (MoveWithAct & { inner: null | Move; index: number })[] = [];
       while (moves.length < maxMoves && amount <= 10000) {
-        moves = completeOutputToMoves(output).slice(0, amount)
+        moves = completeOutputToMoves(output)
+          .slice(0, amount)
           .map((obj, index) => ({
             ...obj,
             inner: getMove(obj),
@@ -136,7 +181,6 @@ export default {
           .filter((obj) => !onlyShowLegalMoves || obj.inner !== null);
         amount *= 10;
       }
-      this.moves = moves;
 
       const currentColor = game.turn();
       if (
@@ -144,7 +188,7 @@ export default {
         ((this.autoPlay.black && currentColor === "b") ||
           (this.autoPlay.white && currentColor === "w"))
       ) {
-        requestAnimationFrame(() => {
+        setTimeout(() => {
           let move = null;
           let counter = 0;
           while (move?.inner == null) {
@@ -152,19 +196,18 @@ export default {
           }
           if (move.inner !== null) {
             game.move(move.inner);
-            this.board.position(game.fen());
+            this.board!.move(move.inner.from as Key, move.inner.to as Key);
             this.update();
           }
-        })
-      }
-      if (game.isGameOver()) {
-        this.gameOver = true;
-        console.log("Game over!");
+        }, 100);
+      } else {
+        this.moves = moves;
       }
     },
+
     newGame() {
       this.gameOver = false;
-    }
+    },
   },
 };
 </script>
@@ -195,5 +238,14 @@ export default {
   z-index: -1;
 }
 
+#chessground-main {
+  width: 500px;
+  height: 500px;
+  position: relative;
+  overflow: hidden;
+}
 
+cg-board {
+  background-color: #bfcfdd;
+}
 </style>
