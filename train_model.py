@@ -11,7 +11,7 @@ from tensorflow.keras import layers, models
 
 print("TensorFlow version: ", tf.__version__)
 
-MODEL_NAME = "models/unique-15Mtrain-256-5layers.h5"
+MODEL_NAME = "models/unique-15Mtrain-1024-4layers.h5"
 
 if os.path.isfile(MODEL_NAME):
     print("Model already exists. Exiting.")
@@ -34,19 +34,27 @@ EPOCHS = 75
 TRAINING_STEPS = (TRAINING_DATA_SIZE[1] - TRAINING_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
 VALIDATION_STEPS = (VALIDATION_DATA_SIZE[1] - VALIDATION_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
 
+GC_THRESHOLD = BATCH_SIZE * 100
+
+print("Training steps per epoch: ", TRAINING_STEPS)
+
 
 def generator_generator(start: int, end: int):
     def generator():
         for i in range(start, end):
-            x = np.load(MODEL_INPUT.format(n=i))
-            y = np.load(MODEL_OUTPUT.format(n=i))
+            x = np.load(MODEL_INPUT.format(n=i), mmap_mode="r")
+            y = np.load(MODEL_OUTPUT.format(n=i), mmap_mode="r")
             for i in range(0, x.shape[0], BATCH_SIZE):
                 x_batch, y_batch = x[i:i+BATCH_SIZE], y[i:i+BATCH_SIZE]
                 y_batch = tf.keras.utils.to_categorical(y_batch, num_classes=4096)
 
                 yield x_batch, y_batch
 
+                if i % GC_THRESHOLD == 0:
+                    gc.collect()
+
             del x, y
+            gc.collect()
 
     return generator
 
@@ -54,11 +62,10 @@ training_generator = generator_generator(*TRAINING_DATA_SIZE)
 validation_generator = generator_generator(*VALIDATION_DATA_SIZE)
 
 model = models.Sequential()
-model.add(layers.Dense(256, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
-model.add(layers.Dense(256, activation='relu'))
-model.add(layers.Dense(256, activation='relu'))
-model.add(layers.Dense(256, activation='relu'))
-model.add(layers.Dense(256, activation='relu'))
+model.add(layers.Dense(1024, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
+model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dense(1024, activation='relu'))
 model.add(layers.Dense(4096, activation='softmax'))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
