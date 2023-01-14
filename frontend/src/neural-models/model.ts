@@ -18,18 +18,25 @@ type Models = {
   "3m-unique-rust-model": Model<StandardPositionalInput, CompleteOutput>
   "15m-unique-model": Model<StandardPositionalInput, CompleteOutput>
   "15mtrain-512neurons-4layers": Model<StandardPositionalInput, CompleteOutput>
+  "puzzletrain-512neurons-4layers": Model<StandardPositionalInput, CompleteOutput>
 }
 
 async function loadTfModel(name: string): Promise<LayersModel> {
   return await tf.loadLayersModel(`models/${name}/model.json`);
 }
 
+let models = {} as { [K in keyof Models]: Models[K] };
+
 export async function loadModel<K extends keyof Models>(name: K): Promise<Models[K]> {
+  if (models[name]) {
+    return models[name];
+  }
   const model = await loadTfModel(name);
   let predict = (input: ModelInput<Models[K]>) => {
     const prediction = model.predict(tf.tensor(input, [1, 833])) as tf.Tensor;
     const output = prediction.dataSync() as ModelOutput<Models[K]>;
     return output;
   };
+  models[name] = {name, predict} as Models[K];
   return { name, predict } as Models[K];
 }
