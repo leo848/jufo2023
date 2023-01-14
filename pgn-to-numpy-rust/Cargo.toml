@@ -17,7 +17,9 @@ opt-level = 3
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+csv = "1.1.6"
 derive_more = "0.99.17"
+fs-err = "2.9.0"
 itertools = "0.10.5"
 npyz = "0.7.1"
 pgn-reader = "0.21.0"

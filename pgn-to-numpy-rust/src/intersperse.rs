@@ -4,7 +4,8 @@ use npyz::{NpyFile, WriteOptions, WriterBuilder};
 use crate::BOARDS_PER_FILE;
 
 use crate::INPUT_LENGTH;
-use crate::INTERSPERSE_CHUNK_SIZE;
+
+pub const INTERSPERSE_CHUNK_SIZE: usize = 1000;
 
 const READ_INPUT_DIR: &str = "../npy_files/20M_neural_input";
 const READ_OUTPUT_DIR: &str = "../npy_files/20M_neural_output";

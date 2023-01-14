@@ -11,24 +11,24 @@ from tensorflow.keras import layers, models
 
 print("TensorFlow version: ", tf.__version__)
 
-MODEL_NAME = "models/unique-15Mtrain-1024-4layers.h5"
+MODEL_NAME = "models/puzzletrain-512-4layers.h5"
 
 if os.path.isfile(MODEL_NAME):
     print("Model already exists. Exiting.")
     exit(1)
 
-MODEL_INPUT = "npy_files/20M_neural_input/{n}.npy"
-MODEL_OUTPUT = "npy_files/20M_neural_output/{n}.npy"
+MODEL_INPUT = "npy_files/puzzle_input/{n}.npy"
+MODEL_OUTPUT = "npy_files/puzzle_output/{n}.npy"
 
 
-TOTAL_DATA_SIZE = 16_000_000
-AMOUNT_OF_FILES = 16
+TOTAL_DATA_SIZE = 14_000_000
+AMOUNT_OF_FILES = 14
 DATA_PER_FILE = TOTAL_DATA_SIZE // AMOUNT_OF_FILES
 
-TRAINING_DATA_SIZE = (0, 15)
-VALIDATION_DATA_SIZE = (15, 16)
+TRAINING_DATA_SIZE = (0, 13)
+VALIDATION_DATA_SIZE = (13, 14)
 
-BATCH_SIZE = 100
+BATCH_SIZE = 64
 EPOCHS = 75
 
 TRAINING_STEPS = (TRAINING_DATA_SIZE[1] - TRAINING_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
@@ -62,10 +62,10 @@ training_generator = generator_generator(*TRAINING_DATA_SIZE)
 validation_generator = generator_generator(*VALIDATION_DATA_SIZE)
 
 model = models.Sequential()
-model.add(layers.Dense(1024, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
-model.add(layers.Dense(1024, activation='relu'))
-model.add(layers.Dense(1024, activation='relu'))
-model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dense(512, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
+model.add(layers.Dense(512, activation='relu'))
+model.add(layers.Dense(512, activation='relu'))
+model.add(layers.Dense(512, activation='relu'))
 model.add(layers.Dense(4096, activation='softmax'))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
