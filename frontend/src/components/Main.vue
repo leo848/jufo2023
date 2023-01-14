@@ -4,7 +4,7 @@
       <v-col cols="12" sm="6" lg="4">
         <div ref="board" id="chessground-main"></div>
       </v-col>
-      <v-col cols="12" sm="6" lg="4">
+      <v-col cols="12" sm="4" lg="3">
         <div v-if="gameOver">
           <GameOver @new="newGame" />
         </div>
@@ -16,6 +16,11 @@
               <v-progress-circular :size="50" :width="6" indeterminate />
             </v-card-text>
           </v-card>
+        </div>
+      </v-col>
+      <v-col cols="12" sm="4" lg="3">
+        <div v-if="showContinuation && model && !gameOver">
+          <Continuation :fen="fen" :key="fen"/>
         </div>
       </v-col>
     </v-row>
@@ -41,6 +46,7 @@ import { loadPiece } from "@/chess/loadPieces";
 
 import MoveDisplay from "@/components/MoveDisplay.vue";
 import GameOver from "@/components/GameOver.vue";
+import Continuation from "@/components/Continuation.vue";
 import type { Chess, Move } from "chess.js";
 import { loadSetting, loadSettings } from "@/settings/settings";
 
@@ -52,6 +58,7 @@ export default {
   components: {
     MoveDisplay,
     GameOver,
+    Continuation,
   },
   created() {
     loadModel("15mtrain-512neurons-4layers")
@@ -65,10 +72,11 @@ export default {
     moves: [] as MoveWithAct[],
     board: null as Api | null,
     autoPlay: loadSetting("autoPlay"),
+    showContinuation: loadSetting("showContinuation"),
     gameOver: false,
+    fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
   }),
   mounted() {
-    // The chess start fen, expressed in Forsyth–Edwards Notation
     const config = {
       autoCastle: true,
       movable: {
@@ -142,6 +150,8 @@ export default {
         }
         destinations.get(move.from as Key)!.push(move.to as Key);
       }
+
+      this.fen = game.fen();
 
       const newConfig = {
         fen: game.fen(),

@@ -28,7 +28,7 @@ async function loadTfModel(name: string): Promise<LayersModel> {
 let models = {} as { [K in keyof Models]: Models[K] };
 
 export async function loadModel<K extends keyof Models>(name: K): Promise<Models[K]> {
-  if (models[name]) {
+  if (models[name] != null) {
     return models[name];
   }
   const model = await loadTfModel(name);

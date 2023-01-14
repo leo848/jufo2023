@@ -10,7 +10,7 @@
           activator="parent"
           max-width="800px"
           >
-          <SettingsDialog @close="newSettings" />
+          <SettingsDialog @cancel="cancel" @save="save" />
         </v-dialog>
       </v-btn>
     </v-app-bar>
@@ -31,7 +31,10 @@ export default {
     mainKey: 0,
   }),
   methods: {
-    newSettings() {
+    cancel() {
+      this.dialog = false
+    },
+    save() {
       this.mainKey++;
       this.dialog = false;
     }

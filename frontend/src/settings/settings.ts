@@ -9,6 +9,7 @@ type Settings = {
     black: boolean,
     white: boolean,
   }
+  showContinuation: boolean,
 }
 
 const defaultSettings: Settings = {
@@ -19,7 +20,8 @@ const defaultSettings: Settings = {
   autoPlay: {
     black: false,
     white: false,
-  }
+  },
+  showContinuation: false,
 } as const;
 
 let settings: Settings = { ...defaultSettings };

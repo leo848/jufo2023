@@ -60,13 +60,21 @@
               <img :src="loadPiece('bK')" class="button-piece"/>
             </v-btn>
           </v-col>
+          <v-col cols="12" md="6">
+            <v-switch
+              v-model="settings.showContinuation"
+              color="primary"
+              label="Neuronale Fortsetzung zeigen"
+              density="compact"
+            />
+          </v-col>
         </v-row>
       </v-container>
     </v-card-text>
     <v-spacer />
     <v-card-actions>
       <v-spacer />
-      <v-btn @click="$emit('close')">Abbrechen</v-btn>
+      <v-btn @click="$emit('cancel')">Abbrechen</v-btn>
       <v-btn @click="save" variant="tonal" color="primary">Speichern</v-btn>
     </v-card-actions>
   </v-card>
@@ -80,6 +88,7 @@ import ChooseTheme from "@/components/ChooseTheme.vue";
 
 export default {
   components: { ChooseTheme },
+  emits: ["cancel", "save"],
   data: () => ({
     settings: loadSettings(),
     themes: themes,
@@ -93,7 +102,7 @@ export default {
   methods: {
     save() {
       saveSettings(this.settings);
-      this.$emit("close");
+      this.$emit("save");
     },
     selectTheme(theme: PieceTheme) {
       this.settings.theme = theme;
