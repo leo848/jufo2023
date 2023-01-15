@@ -53,6 +53,7 @@ import { loadSetting, loadSettings } from "@/settings/settings";
 import { Chessground } from "chessground";
 import type { Api } from "chessground/api";
 import type { Key, Role } from "chessground/types";
+import { temperature } from '@/neural-models/temperature';
 
 export default {
   components: {
@@ -178,7 +179,7 @@ export default {
 
       const { maxMoves, onlyShowLegalMoves } = loadSettings();
 
-      let amount = 10;
+      let amount = 500;
       let moves: (MoveWithAct & { inner: null | Move; index: number })[] = [];
       while (moves.length < maxMoves && amount <= 10000) {
         moves = completeOutputToMoves(output)
@@ -199,20 +200,48 @@ export default {
           (this.autoPlay.white && currentColor === "w"))
       ) {
         setTimeout(() => {
-          let move = null;
-          let counter = 0;
-          while (move?.inner == null) {
-            move = moves[counter++];
-          }
-          if (move.inner !== null) {
-            game.move(move.inner);
-            this.board!.move(move.inner.from as Key, move.inner.to as Key);
-            this.update();
-          }
+          let probs = this.assignProbabilities(moves);
+          let move = this.chooseMove(probs);
+          this.board!.move(move.from as Key, move.to as Key);
+          this.update();
         }, 100);
       } else {
         this.moves = moves;
       }
+    },
+
+    assignProbabilities(moves: MoveWithAct[]): (MoveWithAct & { prob: number })[] {
+      const temp = loadSetting("temperature");
+      const probabilities = temperature(moves.map((move) => move.act), temp);
+      return moves.map((move, i) => {
+        return Object.assign({}, move, { prob: probabilities[i] });
+      });
+    },
+
+    chooseMove(moves: (MoveWithAct & { prob: number })[], tries: number = 20): MoveWithAct {
+      if (tries <= 0) return this.fallbackChooseMove(moves);
+      let rng = Math.random();
+      let chosen = null;
+      for (const move of moves.filter(move => getMove(move) != null)) {
+        if (rng < move.prob) {
+          chosen = move;
+          break;
+        } else {
+          rng -= move.prob;
+        }
+      }
+      if (chosen == null) {
+        return this.chooseMove(moves, tries-1);
+      }
+      else if (game.move(chosen) == null) {
+        return this.chooseMove(moves, tries-0.1);
+      }
+      return chosen;
+    },
+
+    fallbackChooseMove(moves: MoveWithAct[]): MoveWithAct {
+      console.log("fallback");
+      return moves.filter(move => getMove(move) != null)[0]
     },
 
     newGame() {

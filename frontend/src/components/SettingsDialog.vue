@@ -68,6 +68,21 @@
               density="compact"
             />
           </v-col>
+          <v-col cols="12">
+            <v-slider v-model="settings.temperature" :min="0" :max="2" :step="0.1" thumb-label label="Temperatur">
+              <template v-slot:append>
+                <v-text-field
+                  v-model="settings.temperature"
+                  hide-details
+                  single-line
+                  disabled
+                  density="compact"
+                  type="number"
+                  style="width: 90px"
+                  ></v-text-field>
+              </template>
+            </v-slider>
+          </v-col>
         </v-row>
       </v-container>
     </v-card-text>

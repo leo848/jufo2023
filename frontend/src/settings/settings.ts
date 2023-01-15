@@ -10,6 +10,7 @@ type Settings = {
     white: boolean,
   }
   showContinuation: boolean,
+  temperature: number,
 }
 
 const defaultSettings: Settings = {
@@ -22,6 +23,7 @@ const defaultSettings: Settings = {
     white: false,
   },
   showContinuation: false,
+  temperature: 0.5,
 } as const;
 
 let settings: Settings = { ...defaultSettings };
