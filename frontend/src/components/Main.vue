@@ -222,7 +222,12 @@ export default {
       if (tries <= 0) return this.fallbackChooseMove(moves);
       let rng = Math.random();
       let chosen = null;
-      for (const move of moves.filter(move => getMove(move) != null)) {
+
+      moves = moves.filter(move => getMove(move) != null);
+      const sum = moves.reduce((acc, move) => acc + move.prob, 0);
+      moves = moves.map(move => Object.assign({}, move, { prob: move.prob / sum })); // Normalize
+
+      for (const move of moves) {
         if (rng < move.prob) {
           chosen = move;
           break;

@@ -1,9 +1,13 @@
 export function temperature(inputs: number[], temperature: number): number[] {
-  assert(temperature >= 0 && temperature <= 2);
-  if (temperature < 1) {
-    return freeze(inputs, 1 - temperature);
+  assert(temperature >= 0 && temperature <= 1);
+  const preprocess = (temp: number) => - (2 / (Math.pow(temp, 1.8) - 2)) - 1;
+  temperature = preprocess(temperature);
+  assert(temperature >= 0 && temperature <= 1);
+
+  if (temperature < 0.5) {
+    return freeze(inputs, (0.5 - temperature) * 2);
   } else {
-    return heat(inputs, temperature - 1);
+    return heat(inputs, (temperature - 0.5) * 2);
   }
 }
 

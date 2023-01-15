@@ -69,7 +69,7 @@
             />
           </v-col>
           <v-col cols="12">
-            <v-slider v-model="settings.temperature" :min="0" :max="2" :step="0.1" thumb-label label="Temperatur">
+            <v-slider v-model="settings.temperature" :min="0" :max="1" :step="0.025" thumb-label label="Temperatur">
               <template v-slot:append>
                 <v-text-field
                   v-model="settings.temperature"

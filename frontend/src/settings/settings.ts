@@ -23,7 +23,7 @@ const defaultSettings: Settings = {
     white: false,
   },
   showContinuation: false,
-  temperature: 0.2,
+  temperature: 0.5,
 } as const;
 
 let settings: Settings = { ...defaultSettings };
