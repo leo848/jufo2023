@@ -11,30 +11,28 @@ from tensorflow.keras import layers, models
 
 print("TensorFlow version: ", tf.__version__)
 
-MODEL_NAME = "models/puzzletrain-512-4layers.h5"
+MODEL_NAME = "models/unique-15Mtrain-512-4layers-2.h5"
 
 if os.path.isfile(MODEL_NAME):
     print("Model already exists. Exiting.")
     exit(1)
 
-MODEL_INPUT = "npy_files/puzzle_input/{n}.npy"
-MODEL_OUTPUT = "npy_files/puzzle_output/{n}.npy"
+MODEL_INPUT = "npy_files/20M_neural_input/{n}.npy"
+MODEL_OUTPUT = "npy_files/20M_neural_output/{n}.npy"
 
 
-TOTAL_DATA_SIZE = 14_000_000
-AMOUNT_OF_FILES = 14
+TOTAL_DATA_SIZE = 16_000_000
+AMOUNT_OF_FILES = 16
 DATA_PER_FILE = TOTAL_DATA_SIZE // AMOUNT_OF_FILES
 
-TRAINING_DATA_SIZE = (0, 13)
-VALIDATION_DATA_SIZE = (13, 14)
+TRAINING_DATA_SIZE = (0, 15)
+VALIDATION_DATA_SIZE = (15, 16)
 
-BATCH_SIZE = 64
-EPOCHS = 75
+BATCH_SIZE = 128 # Batch size 64 - 4.78% in 2:31
+EPOCHS = 128
 
 TRAINING_STEPS = (TRAINING_DATA_SIZE[1] - TRAINING_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
 VALIDATION_STEPS = (VALIDATION_DATA_SIZE[1] - VALIDATION_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
-
-GC_THRESHOLD = BATCH_SIZE * 100
 
 print("Training steps per epoch: ", TRAINING_STEPS)
 
@@ -49,9 +47,6 @@ def generator_generator(start: int, end: int):
                 y_batch = tf.keras.utils.to_categorical(y_batch, num_classes=4096)
 
                 yield x_batch, y_batch
-
-                if i % GC_THRESHOLD == 0:
-                    gc.collect()
 
             del x, y
             gc.collect()
