@@ -11,7 +11,7 @@ from tensorflow.keras import layers, models
 
 print("TensorFlow version: ", tf.__version__)
 
-MODEL_NAME = "models/unique-15Mtrain-512-4layers-2.h5"
+MODEL_NAME = "models/unique-15Mtrain-724-4layers-2.h5"
 
 if os.path.isfile(MODEL_NAME):
     print("Model already exists. Exiting.")
@@ -57,10 +57,10 @@ training_generator = generator_generator(*TRAINING_DATA_SIZE)
 validation_generator = generator_generator(*VALIDATION_DATA_SIZE)
 
 model = models.Sequential()
-model.add(layers.Dense(512, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
-model.add(layers.Dense(512, activation='relu'))
-model.add(layers.Dense(512, activation='relu'))
-model.add(layers.Dense(512, activation='relu'))
+model.add(layers.Dense(724, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
+model.add(layers.Dense(724, activation='relu'))
+model.add(layers.Dense(724, activation='relu'))
+model.add(layers.Dense(724, activation='relu'))
 model.add(layers.Dense(4096, activation='softmax'))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])

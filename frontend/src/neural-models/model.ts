@@ -19,6 +19,8 @@ type Models = {
   "15m-unique-model": Model<StandardPositionalInput, CompleteOutput>
   "15mtrain-512neurons-4layers": Model<StandardPositionalInput, CompleteOutput>
   "puzzletrain-512neurons-4layers": Model<StandardPositionalInput, CompleteOutput>
+  "puzzletrain-512neurons-4layers-2": Model<StandardPositionalInput, CompleteOutput>
+  "puzzletrain-724neurons-4layers": Model<StandardPositionalInput, CompleteOutput>
 }
 
 async function loadTfModel(name: string): Promise<LayersModel> {
