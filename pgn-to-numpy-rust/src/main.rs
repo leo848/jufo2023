@@ -9,7 +9,7 @@ mod pgn_to_numpy;
 
 pub use common::*;
 
-const ACTION: Action = Action::OnlyCount;
+const ACTION: Action = Action::PgnToNpy;
 
 #[derive(Debug, Clone, Copy, IsVariant)]
 #[allow(dead_code)]

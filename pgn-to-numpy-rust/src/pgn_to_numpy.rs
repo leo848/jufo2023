@@ -12,8 +12,8 @@ pub const AMOUNT_OF_BOARDS: usize = 20_000_000;
 pub const BOARDS_PER_FILE: usize = 500_000;
 pub const AMOUNT_OF_FILES: usize = AMOUNT_OF_BOARDS / BOARDS_PER_FILE;
 
-const NEURAL_INPUT_DIR: &str = "/../npy_files/20M_neural_input";
-const NEURAL_OUTPUT_DIR: &str = "/../npy_files/20M_neural_output";
+const NEURAL_INPUT_DIR: &str = "../npy_files/20M_neural_input";
+const NEURAL_OUTPUT_DIR: &str = "../npy_files/20M_neural_output";
 
 const PGN_FILE: &str = "database-2016-01.pgn";
 
@@ -98,6 +98,9 @@ impl Visitor for NeuralInputCreator {
 }
 
 pub fn main(only_count: bool) -> Result<(), Box<dyn Error>> {
+    assert!(NEURAL_INPUT_DIR.starts_with(".."), "NEURAL_INPUT_DIR must be relative to the root of the project");
+    assert!(NEURAL_OUTPUT_DIR.starts_with(".."), "NEURAL_OUTPUT_DIR must be relative to the root of the project");
+
     let pgn = File::open(PGN_FILE)?;
 
     let mut reader = BufferedReader::new(&pgn);
