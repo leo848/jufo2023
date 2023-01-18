@@ -1,8 +1,7 @@
-use std::{error::Error, fs::File};
+use std::{error::Error, fs::File, mem};
 
 use itertools::Itertools;
 use pgn_reader::{BufferedReader, SanPlus, Skip, Visitor};
-use rand::prelude::SliceRandom;
 use shakmaty::{Chess, Move, Position};
 
 use crate::common::*;
@@ -10,13 +9,13 @@ const MIN_ELO: u32 = 1500;
 const MIN_TIME: u32 = 300;
 
 pub const AMOUNT_OF_BOARDS: usize = 20_000_000;
-pub const BOARDS_PER_FILE: usize = 1_000_000;
+pub const BOARDS_PER_FILE: usize = 500_000;
 pub const AMOUNT_OF_FILES: usize = AMOUNT_OF_BOARDS / BOARDS_PER_FILE;
 
 const NEURAL_INPUT_DIR: &str = "/../npy_files/20M_neural_input";
 const NEURAL_OUTPUT_DIR: &str = "/../npy_files/20M_neural_output";
 
-const PGN_FILE: &str = "database-2016-06.pgn";
+const PGN_FILE: &str = "database-2016-01.pgn";
 
 #[derive(Debug, Clone)]
 struct NeuralInputCreator {
@@ -36,7 +35,7 @@ impl NeuralInputCreator {
 }
 
 impl Visitor for NeuralInputCreator {
-    type Result = Option<[(Chess, Move); 10]>;
+    type Result = Option<Vec<(Chess, Move)>>;
 
     fn begin_game(&mut self) {
         self.board = Chess::default();
@@ -94,13 +93,7 @@ impl Visitor for NeuralInputCreator {
         if !self.considerable_game {
             return None;
         }
-        let mut rng = rand::thread_rng();
-        self.moves
-            .choose_multiple(&mut rng, 10)
-            .cloned()
-            .collect_vec()
-            .try_into()
-            .ok()
+        Some(mem::take(&mut self.moves))
     }
 }
 
@@ -116,7 +109,7 @@ pub fn main(only_count: bool) -> Result<(), Box<dyn Error>> {
 
     if only_count {
         let count = io_pairs.count();
-        println!("{} games", count);
+        println!("{} boards", count);
     } else {
         save_boards(
             io_pairs,

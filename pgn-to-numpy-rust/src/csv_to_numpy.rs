@@ -1,11 +1,6 @@
-use std::{
-    collections::hash_map::DefaultHasher,
-    error::Error,
-    hash::{Hash, Hasher},
-};
+use std::error::Error;
 
 use csv::{ReaderBuilder, StringRecord};
-use itertools::Itertools;
 use shakmaty::{fen::Fen, uci::Uci, CastlingMode, Chess, Move, Position};
 
 use crate::{save_boards, SaveConfig};

@@ -9,7 +9,7 @@ mod pgn_to_numpy;
 
 pub use common::*;
 
-const ACTION: Action = Action::CsvToNpy;
+const ACTION: Action = Action::OnlyCount;
 
 #[derive(Debug, Clone, Copy, IsVariant)]
 #[allow(dead_code)]
