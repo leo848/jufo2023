@@ -11,7 +11,7 @@ from tensorflow.keras import layers, models
 
 print("TensorFlow version: ", tf.__version__)
 
-MODEL_NAME = "models/unique-15Mtrain-724-4layers-2.h5"
+MODEL_NAME = "models/unique-15Mrevtrain-724-4layers-2.h5"
 
 if os.path.isfile(MODEL_NAME):
     print("Model already exists. Exiting.")
@@ -39,7 +39,8 @@ print("Training steps per epoch: ", TRAINING_STEPS)
 
 def generator_generator(start: int, end: int):
     def generator():
-        for i in range(start, end):
+        # for i in range(start, end):
+        for i in reversed(range(start, end)):
             x = np.load(MODEL_INPUT.format(n=i), mmap_mode="r")
             y = np.load(MODEL_OUTPUT.format(n=i), mmap_mode="r")
             for i in range(0, x.shape[0], BATCH_SIZE):

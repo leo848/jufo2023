@@ -62,7 +62,7 @@ export default {
     Continuation,
   },
   created() {
-    loadModel("15mtrain-724neurons-4layers")
+    loadModel("15mrevtrain-724neurons-4layers")
       .then((m) => (this.model = m))
       .then(this.update);
   },
