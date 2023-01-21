@@ -29,6 +29,13 @@ export function move(move: string | {from: string; to: string; promotion?: strin
   }
 }
 
+export function setFen(fen: string) {
+  game.load(fen);
+  for (const event of Object.values(events)) {
+    event(game);
+  }
+}
+
 export function resetGame() {
   game.reset();
   for (const event of Object.values(events)) {

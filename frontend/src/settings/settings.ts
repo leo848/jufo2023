@@ -3,8 +3,8 @@ import type { PieceTheme } from "../chess/loadPieces";
 type Settings = {
   theme: PieceTheme,
   onlyShowLegalMoves: boolean,
+  showActivation: boolean,
   show: {
-    activation: boolean,
     continuation: boolean,
     capturedPieces: boolean,
     neuralOutput: boolean,
@@ -20,13 +20,13 @@ type Settings = {
 const defaultSettings: Settings = {
   theme: "maestro",
   onlyShowLegalMoves: true,
+  showActivation: true,
   maxMoves: 8,
   autoPlay: {
     black: false,
     white: false,
   },
   show: {
-    activation: true,
     continuation: false,
     capturedPieces: true,
     neuralOutput: true,

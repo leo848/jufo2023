@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-row>
-      <v-col cols="12" sm="8" lg="4">
+      <v-col cols="12" sm="8" md="6" lg="4">
         <div ref="board" id="chessground-main"></div>
         <CapturedPieces v-if="show.capturedPieces && !gameOver" :fen="[fen]" :key="0" class="mt-2"/>
       </v-col>
