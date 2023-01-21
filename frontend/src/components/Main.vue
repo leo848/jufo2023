@@ -40,7 +40,7 @@ import {
   completeOutputToMoves,
   fenToStandardPositionalInput,
 } from "@/neural-models/chess_conversions";
-import { game, addEvent, removeEvent, isSquare } from "@/chess/game";
+import { game, addEvent, removeEvent } from "@/chess/game";
 import { getMove } from "@/chess/boardHandlers";
 import { loadPiece } from "@/chess/loadPieces";
 
@@ -52,7 +52,7 @@ import { loadSetting, loadSettings } from "@/settings/settings";
 
 import { Chessground } from "chessground";
 import type { Api } from "chessground/api";
-import type { Key, Role } from "chessground/types";
+import type { Key } from "chessground/types";
 import { temperature } from '@/neural-models/temperature';
 
 export default {
@@ -62,7 +62,7 @@ export default {
     Continuation,
   },
   created() {
-    loadModel("15mrevtrain-724neurons-4layers")
+    loadModel("20mmatestrain-512neurons-4layers")
       .then((m) => (this.model = m))
       .then(this.update);
   },

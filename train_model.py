@@ -11,38 +11,46 @@ from tensorflow.keras import layers, models
 
 print("TensorFlow version: ", tf.__version__)
 
-MODEL_NAME = "models/unique-15Mrevtrain-724-4layers-2.h5"
+MODEL_NAME = "models/mates-20Mtrain-512-4layers.h5"
 
 if os.path.isfile(MODEL_NAME):
     print("Model already exists. Exiting.")
     exit(1)
 
-MODEL_INPUT = "npy_files/20M_neural_input/{n}.npy"
-MODEL_OUTPUT = "npy_files/20M_neural_output/{n}.npy"
+MODEL_INPUT = "npy_files/20M_neural_input/{file}"
+MODEL_OUTPUT = "npy_files/20M_neural_output/{file}"
 
 
-TOTAL_DATA_SIZE = 16_000_000
-AMOUNT_OF_FILES = 16
+TOTAL_DATA_SIZE = 20_000_000
+AMOUNT_OF_FILES = 40
 DATA_PER_FILE = TOTAL_DATA_SIZE // AMOUNT_OF_FILES
 
-TRAINING_DATA_SIZE = (0, 15)
-VALIDATION_DATA_SIZE = (15, 16)
+TRAINING_FILES = [ f"{i}.npy" for i in range(0, 40) if (i + 8) % 10 != 0 ]
+VALIDATION_FILES = [ f"{i}.npy" for i in range(0, 40) if (i + 8) % 10 == 0 ]
 
-BATCH_SIZE = 128 # Batch size 64 - 4.78% in 2:31
+BATCH_SIZE = 64
 EPOCHS = 128
 
-TRAINING_STEPS = (TRAINING_DATA_SIZE[1] - TRAINING_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
-VALIDATION_STEPS = (VALIDATION_DATA_SIZE[1] - VALIDATION_DATA_SIZE[0]) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
+TRAINING_STEPS = (len(TRAINING_FILES)) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
+VALIDATION_STEPS = (len(VALIDATION_FILES)) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
+
+callbacks = [
+    tf.keras.callbacks.TensorBoard(
+        log_dir="tensorboard_logs",
+        histogram_freq=1,
+        embeddings_freq=1,
+    )
+]
 
 print("Training steps per epoch: ", TRAINING_STEPS)
 
 
-def generator_generator(start: int, end: int):
+def generator_generator(files: list[str]):
     def generator():
         # for i in range(start, end):
-        for i in reversed(range(start, end)):
-            x = np.load(MODEL_INPUT.format(n=i), mmap_mode="r")
-            y = np.load(MODEL_OUTPUT.format(n=i), mmap_mode="r")
+        for file in files:
+            x = np.load(MODEL_INPUT.format(file=file))
+            y = np.load(MODEL_OUTPUT.format(file=file))
             for i in range(0, x.shape[0], BATCH_SIZE):
                 x_batch, y_batch = x[i:i+BATCH_SIZE], y[i:i+BATCH_SIZE]
                 y_batch = tf.keras.utils.to_categorical(y_batch, num_classes=4096)
@@ -54,14 +62,14 @@ def generator_generator(start: int, end: int):
 
     return generator
 
-training_generator = generator_generator(*TRAINING_DATA_SIZE)
-validation_generator = generator_generator(*VALIDATION_DATA_SIZE)
+training_generator = generator_generator(TRAINING_FILES)
+validation_generator = generator_generator(VALIDATION_FILES)
 
 model = models.Sequential()
-model.add(layers.Dense(724, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
-model.add(layers.Dense(724, activation='relu'))
-model.add(layers.Dense(724, activation='relu'))
-model.add(layers.Dense(724, activation='relu'))
+model.add(layers.Dense(512, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
+model.add(layers.Dense(512, activation='relu'))
+model.add(layers.Dense(512, activation='relu'))
+model.add(layers.Dense(512, activation='relu'))
 model.add(layers.Dense(4096, activation='softmax'))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
@@ -77,6 +85,7 @@ history = model.fit(
     epochs=EPOCHS,
     validation_data=validation_generator(),
     validation_steps=VALIDATION_STEPS,
+    callbacks=callbacks,
 )
 
 accuracy = history.history['accuracy']
@@ -91,6 +100,7 @@ plt.legend()
 plt.show()
 
 # Save the model
-if input("Save model? [y/N] ").lower() == "y":
+if input("Save model? [Y/n]").lower() != "n":
     model.save(MODEL_NAME)
-    print("Model saved.")
+    print("Model saved")
+
