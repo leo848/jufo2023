@@ -1,5 +1,5 @@
 <template>
-  <v-card max-width="400px" v-if="displayPieces.length">
+  <v-card max-width="400px" v-if="displayPieces().length">
     <v-card-title>Materialunterschied</v-card-title>
     <v-card-text class="mt-n4">
       <v-row no-gutters>
@@ -30,7 +30,7 @@ type DisplayPiece = {
 export default {
   props: {
     fen: {
-      type: Array as unknown as PropType<[string,]>,
+      type: String as PropType<string>,
       required: true,
     },
   },
@@ -86,7 +86,7 @@ export default {
         }, []);
       }
 
-      const currentPieces = fenToPieces(this.fen[0]);
+      const currentPieces = fenToPieces(this.fen);
       const startPieces = fenToPieces();
 
       // Calculate the difference between the current pieces and the start pieces.

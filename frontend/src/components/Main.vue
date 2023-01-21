@@ -3,7 +3,7 @@
     <v-row>
       <v-col cols="12" sm="8" md="6" lg="4">
         <div ref="board" id="chessground-main"></div>
-        <CapturedPieces v-if="show.capturedPieces && !gameOver" :fen="[fen]" :key="0" class="mt-2"/>
+        <CapturedPieces v-if="show.capturedPieces && !gameOver" :fen="fen" :key="0" class="mt-2"/>
       </v-col>
       <v-col cols="12" sm="4" lg="3">
         <div v-if="gameOver">
