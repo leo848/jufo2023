@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-row>
-      <v-col cols="12" sm="6" lg="4">
+      <v-col cols="12" md="6" lg="4">
         <div ref="board" id="chessground-main"></div>
       </v-col>
       <v-col cols="12" sm="4" lg="3">
@@ -11,7 +11,7 @@
         <div v-else>
           <MoveDisplay v-if="model && !gameOver" :moves="moves" />
           <v-card v-else-if="!gameOver" max-width="300px">
-            <v-card-title>Loading model...</v-card-title>
+            <v-card-title>Lade Modell...</v-card-title>
             <v-card-text>
               <v-progress-circular :size="50" :width="6" indeterminate />
             </v-card-text>
@@ -283,8 +283,8 @@ export default {
 }
 
 #chessground-main {
-  width: 500px;
-  height: 500px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   position: relative;
   overflow: hidden;
 }

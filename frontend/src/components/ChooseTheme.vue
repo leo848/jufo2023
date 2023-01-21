@@ -1,10 +1,10 @@
 <template>
   <v-card max-width="400px">
-    <v-card-title>Choose a piece theme</v-card-title>
+    <v-card-title>Wähle ein Theme aus</v-card-title>
     <v-card-text>
       <v-row>
         <v-col cols="12">
-          <v-switch v-model="animate" label="Animate pieces"/>
+          <v-switch v-model="animate" label="Figuren animieren"/>
         </v-col>
         <v-col cols="3" v-for="theme, index in themes" :key="theme">
           <v-tooltip :text="theme" location="top">
