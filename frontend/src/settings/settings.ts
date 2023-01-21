@@ -3,26 +3,34 @@ import type { PieceTheme } from "../chess/loadPieces";
 type Settings = {
   theme: PieceTheme,
   onlyShowLegalMoves: boolean,
-  showActivation: boolean,
+  show: {
+    activation: boolean,
+    continuation: boolean,
+    capturedPieces: boolean,
+    neuralOutput: boolean,
+  }
   maxMoves: number,
   autoPlay: {
     black: boolean,
     white: boolean,
   }
-  showContinuation: boolean,
   temperature: number,
 }
 
 const defaultSettings: Settings = {
   theme: "maestro",
   onlyShowLegalMoves: true,
-  showActivation: true,
   maxMoves: 8,
   autoPlay: {
     black: false,
     white: false,
   },
-  showContinuation: false,
+  show: {
+    activation: true,
+    continuation: false,
+    capturedPieces: true,
+    neuralOutput: true,
+  },
   temperature: 0.5,
 } as const;
 
@@ -34,6 +42,9 @@ export function loadSettings(): Settings {
 }
 
 export function loadSetting<K extends keyof Settings>(key: K): Settings[K] {
+  if (!settings.hasOwnProperty(key)) {
+    throw new Error(`Invalid setting key: ${key}`);
+  }
   return settings[key];
 }
 

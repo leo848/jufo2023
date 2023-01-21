@@ -22,6 +22,7 @@
           </v-col>
           <v-col cols="12" md="6">
             <v-switch
+              :disabled="!settings.show.neuralOutput"
               v-model="settings.onlyShowLegalMoves"
               color="primary"
               label="Nur legale Züge anzeigen"
@@ -30,6 +31,7 @@
           </v-col>
           <v-col cols="12" md="6">
             <v-switch
+              :disabled="!settings.show.neuralOutput"
               v-model="settings.showActivation"
               color="primary"
               label="Neuronale Aktivierung zeigen"
@@ -60,11 +62,27 @@
               <img :src="loadPiece('bK')" class="button-piece"/>
             </v-btn>
           </v-col>
-          <v-col cols="12" md="6">
+          <v-col cols="6">
             <v-switch
-              v-model="settings.showContinuation"
+              v-model="settings.show.continuation"
               color="primary"
               label="Neuronale Fortsetzung zeigen"
+              density="compact"
+            />
+          </v-col>
+          <v-col cols="6">
+            <v-switch
+              v-model="settings.show.neuralOutput"
+              color="primary"
+              label="Neuronale Ausgabe zeigen"
+              density="compact"
+            />
+          </v-col>
+          <v-col cols="6">
+            <v-switch
+              v-model="settings.show.capturedPieces"
+              color="primary"
+              label="Materialunterschied zeigen"
               density="compact"
             />
           </v-col>

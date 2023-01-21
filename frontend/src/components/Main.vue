@@ -1,16 +1,17 @@
 <template>
   <div>
     <v-row>
-      <v-col cols="12" md="6" lg="4">
+      <v-col cols="12" sm="8" lg="4">
         <div ref="board" id="chessground-main"></div>
+        <CapturedPieces v-if="show.capturedPieces && !gameOver" :fen="[fen]" :key="0" class="mt-2"/>
       </v-col>
       <v-col cols="12" sm="4" lg="3">
         <div v-if="gameOver">
           <GameOver @new="newGame" />
         </div>
         <div v-else>
-          <MoveDisplay v-if="model && !gameOver" :moves="moves" />
-          <v-card v-else-if="!gameOver" max-width="300px">
+          <MoveDisplay v-if="show.neuralOutput && model && !gameOver" :moves="moves" />
+          <v-card v-else-if="show.neuralOutput && !gameOver" max-width="300px">
             <v-card-title>Lade Modell...</v-card-title>
             <v-card-text>
               <v-progress-circular :size="50" :width="6" indeterminate />
@@ -19,7 +20,7 @@
         </div>
       </v-col>
       <v-col cols="12" sm="4" lg="3">
-        <div v-if="showContinuation && model && !gameOver">
+        <div v-if="show.continuation && model && !gameOver">
           <Continuation :fen="fen" :key="fen"/>
         </div>
       </v-col>
@@ -28,6 +29,11 @@
 </template>
 
 <script lang="ts">
+import MoveDisplay from "@/components/MoveDisplay.vue";
+import GameOver from "@/components/GameOver.vue";
+import Continuation from "@/components/Continuation.vue";
+import CapturedPieces from "@/components/CapturedPieces.vue";
+
 import type { Model } from "@/neural-models/model";
 import type {
   CompleteOutput,
@@ -44,10 +50,8 @@ import { game, addEvent, removeEvent } from "@/chess/game";
 import { getMove } from "@/chess/boardHandlers";
 import { loadPiece } from "@/chess/loadPieces";
 
-import MoveDisplay from "@/components/MoveDisplay.vue";
-import GameOver from "@/components/GameOver.vue";
-import Continuation from "@/components/Continuation.vue";
-import type { Chess, Move } from "chess.js";
+import type { Chess, Move, Piece } from "chess.js";
+import type { Piece as ChessgroundPiece } from "chessground/types";
 import { loadSetting, loadSettings } from "@/settings/settings";
 
 import { Chessground } from "chessground";
@@ -60,6 +64,7 @@ export default {
     MoveDisplay,
     GameOver,
     Continuation,
+    CapturedPieces,
   },
   created() {
     loadModel("20mmatestrain-512neurons-4layers")
@@ -72,8 +77,9 @@ export default {
     model: null as Model<StandardPositionalInput, CompleteOutput> | null,
     moves: [] as MoveWithAct[],
     board: null as Api | null,
+    capturedPieces: [] as ChessgroundPiece[],
     autoPlay: loadSetting("autoPlay"),
-    showContinuation: loadSetting("showContinuation"),
+    show: loadSetting("show"),
     gameOver: false,
     fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
   }),
@@ -84,12 +90,15 @@ export default {
         free: false,
       },
       events: {
-        move: (orig: Key, dest: Key) => {
+        move: (orig: Key, dest: Key, capturedPiece: ChessgroundPiece | undefined) => {
           if (this.gameOver) return;
           const move = getMove({ from: orig, to: dest });
           if (move) {
             game.move(move);
             this.update();
+          }
+          if (capturedPiece) {
+            this.capturedPieces.push(capturedPiece);
           }
         },
       },
