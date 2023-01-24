@@ -67,7 +67,7 @@ export default {
     CapturedPieces,
   },
   created() {
-    loadModel("20mmatestrain-512neurons-4layers")
+    loadModel("20mmatestrain-512neurons-4layers-2")
       .then((m) => (this.model = m))
       .then(this.update);
   },

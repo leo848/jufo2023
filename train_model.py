@@ -11,7 +11,9 @@ from tensorflow.keras import layers, models
 
 print("TensorFlow version: ", tf.__version__)
 
-MODEL_NAME = "models/mates-20Mtrain-512-4layers.h5"
+MODEL_NAME = "models/mates-20Mtrain-512-4layers-2.h5"
+
+GRAPH_NAME = f"figures/{MODEL_NAME.split('/')[-1].split('.')[0]}-graph.png"
 
 if os.path.isfile(MODEL_NAME):
     print("Model already exists. Exiting.")
@@ -20,30 +22,38 @@ if os.path.isfile(MODEL_NAME):
 MODEL_INPUT = "npy_files/20M_neural_input/{file}"
 MODEL_OUTPUT = "npy_files/20M_neural_output/{file}"
 
+TENSORBOARD = False
 
 TOTAL_DATA_SIZE = 20_000_000
 AMOUNT_OF_FILES = 40
 DATA_PER_FILE = TOTAL_DATA_SIZE // AMOUNT_OF_FILES
 
-TRAINING_FILES = [ f"{i}.npy" for i in range(0, 40) if (i + 8) % 10 != 0 ]
-VALIDATION_FILES = [ f"{i}.npy" for i in range(0, 40) if (i + 8) % 10 == 0 ]
+TRAINING_FILES = [ f"{i}.npy" for i in range(0, 40) if (i + 7) % 10 != 0 ]
+VALIDATION_FILES = [ f"{i}.npy" for i in range(0, 40) if (i + 7) % 10 == 0 ]
 
-BATCH_SIZE = 64
+BATCH_SIZE = 1024
 EPOCHS = 128
 
 TRAINING_STEPS = (len(TRAINING_FILES)) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
 VALIDATION_STEPS = (len(VALIDATION_FILES)) * DATA_PER_FILE // BATCH_SIZE // EPOCHS - 1
 
 callbacks = [
-    tf.keras.callbacks.TensorBoard(
-        log_dir="tensorboard_logs",
-        histogram_freq=1,
-        embeddings_freq=1,
-    )
+    tf.keras.callbacks.ModelCheckpoint(
+        filepath=MODEL_NAME,
+        save_best_only=False,
+        monitor="val_accuracy",
+        verbose=1,
+    ),
 ]
 
-print("Training steps per epoch: ", TRAINING_STEPS)
-
+if TENSORBOARD:
+    callbacks.append(
+        tf.keras.callbacks.TensorBoard(
+            log_dir="tensorboard_logs",
+            histogram_freq=1,
+            embeddings_freq=1,
+        )
+    )
 
 def generator_generator(files: list[str]):
     def generator():
@@ -97,10 +107,7 @@ plt.title('Training and validation accuracy')
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
 plt.legend()
-plt.show()
+# Save the plot
+plt.savefig(GRAPH_NAME)
 
-# Save the model
-if input("Save model? [Y/n]").lower() != "n":
-    model.save(MODEL_NAME)
-    print("Model saved")
-
+print("Done")
