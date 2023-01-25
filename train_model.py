@@ -11,7 +11,7 @@ from tensorflow.keras import layers, models
 
 print("TensorFlow version: ", tf.__version__)
 
-MODEL_NAME = "models/mates-20Mtrain-512-4layers-2.h5"
+MODEL_NAME = "models/15Mtrain-512-4layers-1024batch.h5"
 
 GRAPH_NAME = f"figures/{MODEL_NAME.split('/')[-1].split('.')[0]}-graph.png"
 
@@ -19,17 +19,29 @@ if os.path.isfile(MODEL_NAME):
     print("Model already exists. Exiting.")
     exit(1)
 
-MODEL_INPUT = "npy_files/20M_neural_input/{file}"
-MODEL_OUTPUT = "npy_files/20M_neural_output/{file}"
+MODEL_INPUT = "npy_files/15M_neural_input/{file}"
+MODEL_OUTPUT = "npy_files/15M_neural_output/{file}"
 
 TENSORBOARD = False
 
-TOTAL_DATA_SIZE = 20_000_000
-AMOUNT_OF_FILES = 40
+TOTAL_DATA_SIZE = 16_000_000
+AMOUNT_OF_FILES = 16
+
+# TOTAL_DATA_SIZE = 20_000_000
+# AMOUNT_OF_FILES = 40
+
 DATA_PER_FILE = TOTAL_DATA_SIZE // AMOUNT_OF_FILES
 
-TRAINING_FILES = [ f"{i}.npy" for i in range(0, 40) if (i + 7) % 10 != 0 ]
-VALIDATION_FILES = [ f"{i}.npy" for i in range(0, 40) if (i + 7) % 10 == 0 ]
+assert TOTAL_DATA_SIZE % AMOUNT_OF_FILES == 0
+
+# TRAINING_FILES = [ f"{i}.npy" for i in range(0, 40) if (i + 7) % 10 != 0 ]
+# VALIDATION_FILES = [ f"{i}.npy" for i in range(0, 40) if (i + 7) % 10 == 0 ]
+
+TRAINING_FILES = [ f"{i}.npy" for i in range(0, AMOUNT_OF_FILES) if (i + 7) % 10 != 0 ]
+VALIDATION_FILES = [ f"{i}.npy" for i in range(0, AMOUNT_OF_FILES) if (i + 7) % 10 == 0 ]
+
+assert len(TRAINING_FILES) + len(VALIDATION_FILES) == AMOUNT_OF_FILES
+assert len(set(TRAINING_FILES) & set(VALIDATION_FILES)) == 0
 
 BATCH_SIZE = 1024
 EPOCHS = 128

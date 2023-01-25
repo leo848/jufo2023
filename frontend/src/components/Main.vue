@@ -67,7 +67,7 @@ export default {
     CapturedPieces,
   },
   created() {
-    loadModel("20mmatestrain-512neurons-4layers-2")
+    loadModel("15mtrain-512neurons-4layers-1024batch")
       .then((m) => (this.model = m))
       .then(this.update);
   },
