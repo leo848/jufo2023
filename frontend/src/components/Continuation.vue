@@ -11,10 +11,12 @@
 import { Chessground } from "chessground";
 import type { Api } from "chessground/api";
 
-import { loadModel, type Model } from "@/neural-models/model";import { completeOutputToMoves, fenToStandardPositionalInput } from '@/neural-models/chess_conversions';
+import { loadModel, type Model } from "@/neural-models/model";
+import { completeOutputToMoves, fenToStandardPositionalInput } from '@/neural-models/chess_conversions';
 import type { Key } from 'chessground/types';
 import type { CompleteOutput, StandardPositionalInput } from '@/neural-models/types';
 import { Chess } from 'chess.js';
+import { loadSetting } from '@/settings/settings';
 
 export default {
   props: {
@@ -29,7 +31,7 @@ export default {
     chess: null as Chess | null,
   }),
   created() {
-    loadModel("15mtrain-512neurons-4layers")
+    loadModel(loadSetting("model"))
       .then(model => this.model = model)
       .then(() => setTimeout(this.nextMove, 1000))
   },

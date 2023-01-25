@@ -10,7 +10,7 @@ export interface Model<I, O> {
 type ModelInput<M> = M extends Model<infer I, any> ? I : never;
 type ModelOutput<M> = M extends Model<any, infer O> ? O : never;
 
-type Models = {
+export type Models = {
   "original": Model<StandardPositionalInput, FromToOutput>
   "vertical-model": Model<StandardPositionalInput, FromToOutput>
   "ole-model": Model<StandardPositionalInput, FromToOutput>
@@ -26,6 +26,9 @@ type Models = {
   "20mmatestrain-512neurons-4layers-2": Model<StandardPositionalInput, CompleteOutput>
   "15mtrain-512neurons-4layers-1024batch": Model<StandardPositionalInput, CompleteOutput>
 }
+
+
+export const defaultModel = "15mtrain-512neurons-4layers-1024batch" as const;
 
 async function loadTfModel(name: string): Promise<LayersModel> {
   return await tf.loadLayersModel(`models/${name}/model.json`);

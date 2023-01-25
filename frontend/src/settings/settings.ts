@@ -1,3 +1,4 @@
+import {defaultModel} from "@/neural-models/model";
 import type { PieceTheme } from "../chess/loadPieces";
 
 type Settings = {
@@ -15,6 +16,7 @@ type Settings = {
     white: boolean,
   }
   temperature: number,
+  model: typeof defaultModel,
 }
 
 const defaultSettings: Settings = {
@@ -32,6 +34,7 @@ const defaultSettings: Settings = {
     neuralOutput: true,
   },
   temperature: 0.5,
+  model: defaultModel,
 } as const;
 
 let settings: Settings = { ...defaultSettings };
