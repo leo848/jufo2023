@@ -1,5 +1,11 @@
 <template>
   <v-row>
+    <v-col cols="12">
+      <p class="text-h5">Zugvorschläge des Modells</p>
+      <p class="text-body-2">
+        Sicherheit: {{ (gini * 100).toFixed(2) }}%
+      </p>
+    </v-col>
     <transition-group name="moves">
     <v-col
       v-for="move in computedMoves"
@@ -87,6 +93,10 @@ export default {
           return move.from && move.to && move.act;
         });
       },
+    },
+    gini: {
+      type: Number,
+      required: true,
     },
   },
 };

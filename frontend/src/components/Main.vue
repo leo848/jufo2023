@@ -10,7 +10,7 @@
           <GameOver @new="newGame" />
         </div>
         <div v-else>
-          <MoveDisplay v-if="show.neuralOutput && model && !gameOver" :moves="moves" />
+          <MoveDisplay v-if="show.neuralOutput && model && !gameOver" :moves="moves" :gini="gini" />
           <v-card v-else-if="show.neuralOutput && !gameOver" max-width="300px">
             <v-card-title>Lade Modell...</v-card-title>
             <v-card-text>
@@ -58,6 +58,7 @@ import { Chessground } from "chessground";
 import type { Api } from "chessground/api";
 import type { Key } from "chessground/types";
 import { temperature } from '@/neural-models/temperature';
+import { gini } from '@/neural-models/gini';
 
 export default {
   components: {
@@ -76,6 +77,7 @@ export default {
     event: 0,
     model: null as Model<StandardPositionalInput, CompleteOutput> | null,
     moves: [] as MoveWithAct[],
+    gini: -1,
     board: null as Api | null,
     capturedPieces: [] as ChessgroundPiece[],
     autoPlay: loadSetting("autoPlay"),
@@ -217,6 +219,15 @@ export default {
       } else {
         this.moves = moves;
       }
+
+      const activations = moves.map((move) => move.act);
+      let giniInputs = activations.filter(act => act > 0.01);
+      const minAmount = 20;
+      if (giniInputs.length < minAmount) {
+        giniInputs = activations.slice(0, minAmount)
+      }
+
+      this.gini = gini(giniInputs);
     },
 
     assignProbabilities(moves: MoveWithAct[]): (MoveWithAct & { prob: number })[] {
