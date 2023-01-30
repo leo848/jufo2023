@@ -26,7 +26,7 @@
       <div class="d-flex flex-row justify-space-between">
         <div v-if="move.inner" v-html="prettyMove(move.inner)" />
           <div v-else class="text-h5 pl-2 py-1">{{ move.from }} - {{ move.to }}</div>
-          <div v-if="showActivation" class="text-gray mr-1">
+          <div v-if="showActivation" class="text-gray mr-1" @click="hover(move)">
             {{ move.act.toFixed(4).slice(1) }}<br/>
             <div v-if="showIndex" class="mt-n2">#{{ move.index }}</div>
           </div>
