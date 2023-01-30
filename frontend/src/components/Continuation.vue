@@ -31,12 +31,13 @@ export default {
     chess: null as Chess | null,
   }),
   created() {
+    console.log("model is " + loadSetting("model"));
     loadModel(loadSetting("model"))
       .then(model => this.model = model)
       .then(() => setTimeout(this.nextMove, 1000))
   },
   async mounted() {
-    this.model = await loadModel("15mtrain-512neurons-4layers");
+    // this.model = await loadModel("15mtrain-512neurons-4layers");
     const options = {
       fen: this.fen,
       orientation: "white",

@@ -28,7 +28,7 @@ export type Models = {
 }
 
 
-export const defaultModel = "15mtrain-512neurons-4layers-1024batch" as const;
+export const defaultModel = "20mmatestrain-512neurons-4layers-2";
 
 async function loadTfModel(name: string): Promise<LayersModel> {
   return await tf.loadLayersModel(`models/${name}/model.json`);
