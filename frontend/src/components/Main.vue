@@ -10,7 +10,7 @@
           <GameOver @new="newGame" />
         </div>
         <div v-else>
-          <MoveDisplay v-if="show.neuralOutput && model && !gameOver" :moves="moves" :gini="gini" />
+          <MoveDisplay v-if="show.neuralOutput && model && !gameOver" :moves="moves" :gini="gini" @suggest="suggestMove" />
           <v-card v-else-if="show.neuralOutput && !gameOver" max-width="300px">
             <v-card-title>Lade Modell...</v-card-title>
             <v-card-text>
@@ -267,6 +267,21 @@ export default {
     fallbackChooseMove(moves: MoveWithAct[]): MoveWithAct {
       console.log("fallback");
       return moves.filter(move => getMove(move) != null)[0]
+    },
+
+    suggestMove(move?: Move) {
+      if (!move) {
+        this.board!.setShapes([]);
+        return;
+      }
+      const { from, to } = move;
+      this.board!.setShapes([
+        {
+          orig: from as Key,
+          dest: to as Key,
+          brush: "paleBlue",
+        },
+      ]);
     },
 
     newGame() {

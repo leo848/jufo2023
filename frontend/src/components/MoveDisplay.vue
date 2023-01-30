@@ -16,6 +16,8 @@
       :style="'background: ' + (move.inner ? actToColor(move.act) : gray)"
       :key="move.from + move.to + move.inner?.san"
       @click="move.inner && makeMove(move.inner)"
+      @mouseover="hover(move)"
+      @mouseleave="hover()"
       max-width="300"
       max-height="50"
       elevation="3"
@@ -77,13 +79,14 @@ export default {
       let newAct = this.interpolate(25)(act);
       let red = Math.min(1.0, 2.0 - 2.0 * newAct) * 200;
       let green = Math.min(1.0, 2.0 * newAct) * 200;
-      // return `rgb(${red}, ${green}, 0)`;
 
-      // Create a linear gradient with the calculated color on the left and a darker version on the right.
-      // The first color stop is at 75% and the second at 90%.
       return `linear-gradient(90deg, rgb(${red}, ${green}, 0) 70%, rgb(${red * 0.7}, ${green * 0.7}, 0) 90%)`;
     },
+    hover(move?: Move) {
+      this.$emit("suggest", move);
+    }
   },
+  emits: ["suggest"],
   props: {
     moves: {
       type: Array,
