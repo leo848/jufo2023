@@ -275,11 +275,15 @@ export default {
         return;
       }
       const { from, to } = move;
+      let brush = "paleBlue";
+      if (getMove(move) == null) {
+        brush = "red";
+      }
       this.board!.setShapes([
         {
           orig: from as Key,
           dest: to as Key,
-          brush: "paleBlue",
+          brush,
         },
       ]);
     },
