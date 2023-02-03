@@ -48,7 +48,6 @@ export default {
       const positionalInput = fenToStandardPositionalInput(this.fen);
       const evaluation = this.model.predict(positionalInput);
       this.evaluation = evaluationOutputToEvaluation(evaluation);
-      console.log(this.evaluation);
     }
   }
 }

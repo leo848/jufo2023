@@ -17,6 +17,7 @@ type Settings = {
   }
   temperature: number,
   model: typeof defaultModel,
+  opponent: "neural" | "minimax",
 }
 
 const defaultSettings: Settings = {
@@ -35,6 +36,7 @@ const defaultSettings: Settings = {
   },
   temperature: 0.5,
   model: defaultModel,
+  opponent: "neural",
 } as const;
 
 let settings: Settings = { ...defaultSettings };
