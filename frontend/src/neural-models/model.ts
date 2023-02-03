@@ -1,6 +1,6 @@
 import type {LayersModel} from '@tensorflow/tfjs';
 import * as tf from '@tensorflow/tfjs';
-import type {CompleteOutput, FromToOutput, StandardPositionalInput} from './types';
+import type {CompleteOutput, FromToOutput, StandardPositionalInput, Evaluation} from './types';
 
 export interface Model<I, O> {
   name: string;
@@ -25,8 +25,10 @@ export type Models = {
   "20mmatestrain-512neurons-4layers": Model<StandardPositionalInput, CompleteOutput>
   "20mmatestrain-512neurons-4layers-2": Model<StandardPositionalInput, CompleteOutput>
   "15mtrain-512neurons-4layers-1024batch": Model<StandardPositionalInput, CompleteOutput>
+  "20mevaltrain-512neurons-4layers": Model<StandardPositionalInput, Evaluation>
 }
 
+export type EvaluationModel = "20mevaltrain-512neurons-4layers";
 
 export const defaultModel = "20mmatestrain-512neurons-4layers-2";
 

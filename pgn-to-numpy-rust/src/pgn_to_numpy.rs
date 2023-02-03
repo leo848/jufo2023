@@ -1,7 +1,10 @@
-use std::hash::Hasher;
-use std::hash::Hash;
-use std::collections::hash_map::DefaultHasher;
-use std::{error::Error, fs::File, mem};
+use std::{
+    collections::hash_map::DefaultHasher,
+    error::Error,
+    fs::File,
+    hash::{Hash, Hasher},
+    mem,
+};
 
 use itertools::Itertools;
 use pgn_reader::{BufferedReader, SanPlus, Skip, Visitor};
@@ -108,9 +111,6 @@ impl Visitor for NeuralInputCreator {
 }
 
 pub fn main(only_count: bool) -> Result<(), Box<dyn Error>> {
-    assert!(NEURAL_INPUT_DIR.starts_with(".."), "NEURAL_INPUT_DIR must be relative to the root of the project");
-    assert!(NEURAL_OUTPUT_DIR.starts_with(".."), "NEURAL_OUTPUT_DIR must be relative to the root of the project");
-
     let pgn = File::open(PGN_FILE)?;
 
     let mut reader = BufferedReader::new(&pgn);

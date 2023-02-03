@@ -24,4 +24,9 @@ export type CompleteOutput = Float32Array & { length: 4096 } & {
   readonly __tag: unique symbol;
 };
 
+// An evaluation contains a single float.
+export type Evaluation = Float32Array & { length: 1 } & {
+  readonly __tag: unique symbol;
+};
+
 export type MoveWithAct = { from: string; to: string; act: number };

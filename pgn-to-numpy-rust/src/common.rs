@@ -6,8 +6,7 @@ use std::{
     time::Instant,
 };
 
-use fs_err::{self as fs, File };
-
+use fs_err::{self as fs, File};
 use itertools::Itertools;
 use npyz::WriterBuilder;
 use shakmaty::{Chess, Color, Move, Piece, Position, Square};
@@ -61,6 +60,11 @@ pub fn move_to_output(m: &Move) -> u16 {
     from as u16 * 64 + to as u16
 }
 
+pub fn eval_to_output(eval: f32) -> f32 {
+    // Calculate the sigmoid of the evaluation
+    1.0 / (1.0 + (-eval).exp())
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct SaveConfig<'a> {
     neural_input_dir: &'a Path,
@@ -71,16 +75,22 @@ pub struct SaveConfig<'a> {
 }
 
 impl<'a> SaveConfig<'a> {
-    pub fn new<P>(
-        neural_input_dir: &'a P,
-        neural_output_dir: &'a P,
+    pub fn new(
+        neural_input_dir: &'a str,
+        neural_output_dir: &'a str,
         boards_per_file: usize,
         amount_of_files: usize,
         unique: bool,
-    ) -> Self
-    where
-        P: AsRef<Path> + 'a + ?Sized,
-    {
+    ) -> Self {
+        assert!(
+            neural_input_dir.starts_with(".."),
+            "NEURAL_INPUT_DIR must be relative to the root of the project"
+        );
+        assert!(
+            neural_output_dir.starts_with(".."),
+            "NEURAL_OUTPUT_DIR must be relative to the root of the project"
+        );
+
         Self {
             neural_input_dir: neural_input_dir.as_ref(),
             neural_output_dir: neural_output_dir.as_ref(),
@@ -106,6 +116,81 @@ pub fn save_boards(
 
     let io_pairs_chunked = io_pairs
         .map(|(chess, r#move)| (chess_to_input(&chess), move_to_output(&r#move)))
+        .unique_by(|(input, _)| {
+            let mut hasher = DefaultHasher::new();
+            input.hash(&mut hasher);
+            hasher.finish()
+        })
+        .chunks(config.boards_per_file);
+
+    let start_time = Instant::now();
+
+    for (chunk_index, chunk) in io_pairs_chunked
+        .into_iter()
+        .take(config.amount_of_files)
+        .enumerate()
+    {
+        let mut inputs = File::create(config.neural_input_dir.join(format!("{chunk_index}.npy")))?;
+        let mut input_writer = {
+            npyz::WriteOptions::new()
+                .default_dtype()
+                .shape(&[config.boards_per_file as u64, INPUT_LENGTH as u64])
+                .writer(&mut inputs)
+                .begin_nd()?
+        };
+
+        let mut outputs =
+            File::create(config.neural_output_dir.join(format!("{chunk_index}.npy")))?;
+        let mut output_writer = {
+            npyz::WriteOptions::new()
+                .default_dtype()
+                .shape(&[config.boards_per_file as u64])
+                .writer(&mut outputs)
+                .begin_nd()?
+        };
+
+        chunk
+            .enumerate()
+            .for_each(|(board_index, (input, output))| {
+                // i is the index in the chunk, not the total index
+                // so we need to add the chunk index to it
+                debug(
+                    start_time,
+                    chunk_index * config.boards_per_file + board_index,
+                    &config,
+                );
+                input_writer.extend(input).expect("IO error");
+                output_writer.push(&output).expect("IO error");
+            });
+
+        input_writer.finish()?;
+        output_writer.finish()?;
+    }
+
+    Ok(())
+}
+
+pub fn save_boards_outputs<T>(
+    io_pairs: impl Iterator<Item = (Chess, T)>,
+    config: SaveConfig<'_>,
+) -> io::Result<()>
+where
+    T: npyz::Serialize + npyz::AutoSerialize,
+{
+    assert!(
+        config.neural_input_dir != config.neural_output_dir,
+        "Input and output directories must be distinct"
+    );
+    if config.neural_input_dir.exists() || config.neural_output_dir.exists() {
+        panic!("Directory already exists!");
+    }
+
+    for dir in [config.neural_input_dir, config.neural_output_dir] {
+        fs::create_dir(dir)?;
+    }
+
+    let io_pairs_chunked = io_pairs
+        .map(|(chess, output)| (chess_to_input(&chess), output))
         .unique_by(|(input, _)| {
             let mut hasher = DefaultHasher::new();
             input.hash(&mut hasher);

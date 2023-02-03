@@ -3,6 +3,7 @@
     <v-row>
       <v-col cols="12" sm="8" md="6" lg="4">
         <div ref="board" id="chessground-main"></div>
+        <Evaluation :fen="fen" v-if="!gameOver" class="mt-4"/>
         <CapturedPieces v-if="show.capturedPieces && !gameOver" :fen="fen" :key="0" class="mt-2"/>
       </v-col>
       <v-col cols="12" sm="4" lg="3">
@@ -10,7 +11,7 @@
           <GameOver @new="newGame" />
         </div>
         <div v-else>
-          <MoveDisplay v-if="show.neuralOutput && model && !gameOver" :moves="moves" :gini="gini" @suggest="suggestMove" />
+          <MoveDisplay v-if="show.neuralOutput && model && !gameOver" :moves="moves" :legals="legals" @suggest="suggestMove" />
           <v-card v-else-if="show.neuralOutput && !gameOver" max-width="300px">
             <v-card-title>Lade Modell...</v-card-title>
             <v-card-text>
@@ -32,6 +33,7 @@
 import MoveDisplay from "@/components/MoveDisplay.vue";
 import GameOver from "@/components/GameOver.vue";
 import Continuation from "@/components/Continuation.vue";
+import Evaluation from "@/components/Evaluation.vue";
 import CapturedPieces from "@/components/CapturedPieces.vue";
 
 import type { Model } from "@/neural-models/model";
@@ -58,13 +60,13 @@ import { Chessground } from "chessground";
 import type { Api } from "chessground/api";
 import type { Key } from "chessground/types";
 import { temperature } from '@/neural-models/temperature';
-import { gini } from '@/neural-models/gini';
 
 export default {
   components: {
     MoveDisplay,
     GameOver,
     Continuation,
+    Evaluation,
     CapturedPieces,
   },
   created() {
@@ -77,7 +79,7 @@ export default {
     event: 0,
     model: null as Model<StandardPositionalInput, CompleteOutput> | null,
     moves: [] as MoveWithAct[],
-    gini: -1,
+    legals: -1,
     board: null as Api | null,
     capturedPieces: [] as ChessgroundPiece[],
     autoPlay: loadSetting("autoPlay"),
@@ -220,14 +222,10 @@ export default {
         this.moves = moves;
       }
 
-      const activations = moves.map((move) => move.act);
-      let giniInputs = activations.filter(act => act > 0.01);
-      const minAmount = 20;
-      if (giniInputs.length < minAmount) {
-        giniInputs = activations.slice(0, minAmount)
-      }
+      const legalMoves = this.moves.filter((move) => move.inner !== null);
+      const activationSum = legalMoves.reduce((acc, move) => acc + move.act, 0);
 
-      this.gini = gini(giniInputs);
+      this.legals = activationSum;
     },
 
     assignProbabilities(moves: MoveWithAct[]): (MoveWithAct & { prob: number })[] {

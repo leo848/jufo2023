@@ -107,3 +107,9 @@ export function completeOutputToMoves(
 
   return moves.sort((a, b) => b.act - a.act);
 }
+
+export function evaluationOutputToEvaluation(
+  output: Float32Array
+): number {
+  return output[0];
+}

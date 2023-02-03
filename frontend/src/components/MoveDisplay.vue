@@ -3,7 +3,7 @@
     <v-col cols="12">
       <p class="text-h5">Zugvorschläge des Modells</p>
       <p class="text-body-2">
-        Sicherheit: {{ (gini * 100).toFixed(2) }}%
+        Legale Ausgaben: {{ (legals * 100).toFixed(2) }}%
       </p>
     </v-col>
     <transition-group name="moves">
@@ -97,7 +97,7 @@ export default {
         });
       },
     },
-    gini: {
+    legals: {
       type: Number,
       required: true,
     },
