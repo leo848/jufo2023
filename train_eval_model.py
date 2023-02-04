@@ -5,7 +5,7 @@ import gc
 import os.path
 from matplotlib import pyplot as plt
 
-MODEL_NAME = "models/eval-20Mtrain-512neurons-4layers.h5"
+MODEL_NAME = "models/eval-20Mtrain-1024neurons-5layers.h5"
 GRAPH_NAME = f"figures/{MODEL_NAME.split('/')[-1].split('.')[0]}-graph.png"
 
 if os.path.isfile(MODEL_NAME):
@@ -75,11 +75,12 @@ training_generator = generator_generator(TRAINING_FILES)
 validation_generator = generator_generator(VALIDATION_FILES)
 
 model = models.Sequential()
-model.add(layers.Dense(512, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
-model.add(layers.Dense(512, activation='relu'))
-model.add(layers.Dense(512, activation='relu'))
-model.add(layers.Dense(512, activation='relu'))
-model.add(layers.Dense(1))
+model.add(layers.Dense(1024, activation='relu', input_shape=(1 + (1+2*6) * 64,)))
+model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dense(1, activation='sigmoid'))
 
 model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 

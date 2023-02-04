@@ -26,6 +26,7 @@ export type Models = {
   "20mmatestrain-512neurons-4layers-2": Model<StandardPositionalInput, CompleteOutput>
   "15mtrain-512neurons-4layers-1024batch": Model<StandardPositionalInput, CompleteOutput>
   "20mevaltrain-512neurons-4layers": Model<StandardPositionalInput, Evaluation>
+  "20mevaltrain-1024neurons-4layers": Model<StandardPositionalInput, Evaluation>
 }
 
 export type EvaluationModel = "20mevaltrain-512neurons-4layers";

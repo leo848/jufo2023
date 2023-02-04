@@ -63,15 +63,6 @@
             </v-btn>
           </v-col>
           <v-col cols="6">
-            <v-select
-              v-model="settings.opponent"
-              :items="['neural', 'minimax']"
-              label="Gegner"
-              color="primary"
-              dense
-            />
-          </v-col>
-          <v-col cols="6">
             <v-switch
               v-model="settings.show.continuation"
               color="primary"

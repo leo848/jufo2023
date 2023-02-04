@@ -51,7 +51,6 @@ import {
 import { game, addEvent, removeEvent } from "@/chess/game";
 import { getMove } from "@/chess/boardHandlers";
 import { loadPiece } from "@/chess/loadPieces";
-import { miniMax } from "@/chess/minimax";
 
 import type { Chess, Move, Piece } from "chess.js";
 import type { Piece as ChessgroundPiece } from "chessground/types";
@@ -239,11 +238,6 @@ export default {
     },
 
     chooseMove(moves: (MoveWithAct & { prob: number })[], tries: number = 20): MoveWithAct {
-      if (loadSetting("opponent") === "minimax") {
-        const bestMove = miniMax(game, 2);
-        return Object.assign({}, game.move(bestMove), { act: 0, prob: 1 });
-      }
-
       if (tries <= 0) return this.fallbackChooseMove(moves);
       let rng = Math.random();
       let chosen = null;
