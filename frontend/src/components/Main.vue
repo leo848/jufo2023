@@ -11,7 +11,7 @@
           <GameOver @new="newGame" />
         </div>
         <div v-else>
-          <MoveDisplay v-if="show.neuralOutput && model && !gameOver" :moves="moves" :legals="legals" @suggest="suggestMove" />
+          <MoveDisplay v-if="show.neuralOutput && model && !gameOver" :moves="moves" :legals="legals" @suggest="suggestMove" @showAll="showAll" />
           <v-card v-else-if="show.neuralOutput && !gameOver" max-width="300px">
             <v-card-title>Lade Modell...</v-card-title>
             <v-card-text>
@@ -52,7 +52,7 @@ import { game, addEvent, removeEvent } from "@/chess/game";
 import { getMove } from "@/chess/boardHandlers";
 import { loadPiece } from "@/chess/loadPieces";
 
-import type { Chess, Move, Piece } from "chess.js";
+import type { Chess, Move } from "chess.js";
 import type { Piece as ChessgroundPiece } from "chessground/types";
 import { loadSetting, loadSettings } from "@/settings/settings";
 
@@ -60,6 +60,7 @@ import { Chessground } from "chessground";
 import type { Api } from "chessground/api";
 import type { Key } from "chessground/types";
 import { temperature } from '@/neural-models/temperature';
+import type { DrawShape } from 'chessground/draw';
 
 export default {
   components: {
@@ -202,7 +203,6 @@ export default {
             inner: getMove(obj),
             index: index + 1,
           }))
-          .filter((obj) => !onlyShowLegalMoves || obj.inner !== null);
         amount *= 10;
       }
 
@@ -276,7 +276,7 @@ export default {
       const { from, to } = move;
       let brush = "paleBlue";
       if (getMove(move) == null) {
-        brush = "red";
+        brush = "paleRed";
       }
       this.board!.setShapes([
         {
@@ -285,6 +285,31 @@ export default {
           brush,
         },
       ]);
+    },
+
+    showAll() {
+      this.board!.setShapes(
+        this.moves
+          .filter(move => move.act > 0.01)
+          .map((move, index) => {
+            let brush = index === 0 ? "blue" : "paleBlue";
+            if (getMove(move) == null) {
+              brush = index === 0 ? "red": "paleRed";
+            }
+            const prepareLineWidth = (n: number) => {
+              return 25 * Math.pow(n, 2 / 5) + 1;
+            }
+            const lineWidth = prepareLineWidth(move.act);
+            return {
+              orig: move.from as Key,
+              dest: move.to as Key,
+              modifiers: {
+                lineWidth, 
+              },
+              brush,
+            };
+          })
+      );
     },
 
     newGame() {

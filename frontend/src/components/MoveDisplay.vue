@@ -1,7 +1,10 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <p class="text-h5">Zugvorschläge des Modells</p>
+      <p class="text-h5">
+        Zugvorschläge des Modells
+        <v-btn icon="mdi-eye" @click="showAll" @blur="hover()" />
+      </p>
       <p class="text-body-2">
         Legale Ausgaben: {{ (legals * 100).toFixed(2) }}%
       </p>
@@ -24,13 +27,14 @@
       rounded="lg"
       >
       <div class="d-flex flex-row justify-space-between">
-        <div v-if="move.inner" v-html="prettyMove(move.inner)" />
-          <div v-else class="text-h5 pl-2 py-1">{{ move.from }} - {{ move.to }}</div>
-          <div v-if="showActivation" class="text-gray mr-1" @click="hover(move)">
-            {{ move.act.toFixed(4).slice(1) }}<br/>
-            <div v-if="showIndex" class="mt-n2">#{{ move.index }}</div>
-          </div>
+        <div v-if="move.inner" v-html="prettyMove(move.inner)"></div>
+        <div v-else class="text-h5 pl-2 py-1">{{ move.from }} - {{ move.to }}</div>
+        <v-spacer />
+        <div v-if="showActivation" class="text-gray mr-1" @click="hover(move)">
+          {{ move.act.toFixed(4).slice(1) }}<br/>
+          <div v-if="showIndex" class="mt-n2">#{{ move.index }}</div>
         </div>
+      </div>
     </v-card>
     </v-col></transition-group>
   </v-row>
@@ -41,6 +45,7 @@ import type { Move } from "chess.js";
 import { loadPiece } from "@/chess/loadPieces";
 import { move } from "@/chess/game";
 import { loadSetting } from "@/settings/settings";
+import type { MoveWithAct } from '@/neural-models/types';
 
 export default {
   name: "MoveDisplay",
@@ -52,6 +57,11 @@ export default {
   computed: {
     computedMoves() {
       let maxMoves = loadSetting("maxMoves");
+      let showOnlyLegalMoves = loadSetting("onlyShowLegalMoves");
+      let moves = this.moves as (MoveWithAct & { inner?: Move })[];
+      if (showOnlyLegalMoves) {
+        moves = moves.filter((move) => move.inner);
+      }
       return this.moves.slice(0, maxMoves);
     }
   },
@@ -84,9 +94,12 @@ export default {
     },
     hover(move?: Move) {
       this.$emit("suggest", move);
+    },
+    showAll() {
+      this.$emit("showAll");
     }
   },
-  emits: ["suggest"],
+  emits: ["suggest", "showAll"],
   props: {
     moves: {
       type: Array,
