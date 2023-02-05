@@ -4,7 +4,7 @@
       <v-col cols="12" sm="8" md="6" lg="4">
         <div ref="board" id="chessground-main"></div>
         <Evaluation :fen="fen" v-if="!gameOver" class="mt-4"/>
-        <CapturedPieces v-if="show.capturedPieces && !gameOver" :fen="fen" :key="0" class="mt-2"/>
+        <CapturedPieces v-if="show.capturedPieces && !gameOver" :fen="fen" class="mt-2"/>
       </v-col>
       <v-col cols="12" sm="4" lg="3">
         <div v-if="gameOver">
@@ -60,7 +60,6 @@ import { Chessground } from "chessground";
 import type { Api } from "chessground/api";
 import type { Key } from "chessground/types";
 import { temperature } from '@/neural-models/temperature';
-import type { DrawShape } from 'chessground/draw';
 
 export default {
   components: {
@@ -268,52 +267,47 @@ export default {
       return moves.filter(move => getMove(move) != null)[0]
     },
 
-    suggestMove(move?: Move) {
+    moveToShape(move: MoveWithAct, index ?: number) {
+      let brush = index === 0 ? "blue" : "paleBlue";
+      if (getMove(move) == null) {
+        brush = index === 0 ? "red" : "paleRed";
+      }
+      const prepareLineWidth = (n: number) => {
+        return 25 * Math.pow(n, 2 / 5) + 1;
+      }
+      return {
+        orig: move.from as Key,
+        dest: move.to as Key,
+        brush,
+        modifiers: {
+          lineWidth: prepareLineWidth(move.act),
+        }
+      };
+    },
+
+    suggestMove(move?: MoveWithAct) {
       if (!move) {
         this.board!.setShapes([]);
         return;
       }
-      const { from, to } = move;
-      let brush = "paleBlue";
-      if (getMove(move) == null) {
-        brush = "paleRed";
-      }
-      this.board!.setShapes([
-        {
-          orig: from as Key,
-          dest: to as Key,
-          brush,
-        },
-      ]);
+      this.board!.setShapes([ this.moveToShape(move) ]); 
     },
 
     showAll() {
       this.board!.setShapes(
         this.moves
           .filter(move => move.act > 0.01)
-          .map((move, index) => {
-            let brush = index === 0 ? "blue" : "paleBlue";
-            if (getMove(move) == null) {
-              brush = index === 0 ? "red": "paleRed";
-            }
-            const prepareLineWidth = (n: number) => {
-              return 25 * Math.pow(n, 2 / 5) + 1;
-            }
-            const lineWidth = prepareLineWidth(move.act);
-            return {
-              orig: move.from as Key,
-              dest: move.to as Key,
-              modifiers: {
-                lineWidth, 
-              },
-              brush,
-            };
-          })
+          .map(this.moveToShape)
       );
     },
 
     newGame() {
       this.gameOver = false;
+      // Remove the remnants of the last move, i.e. the last move's
+      // destination squares.
+      this.board!.set({
+        lastMove: undefined,
+      });
     },
   },
 };

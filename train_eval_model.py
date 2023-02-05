@@ -5,7 +5,7 @@ import gc
 import os.path
 from matplotlib import pyplot as plt
 
-MODEL_NAME = "models/eval-20Mtrain-1024neurons-5layers.h5"
+MODEL_NAME = "models/eval-20Mtrain-1024neurons-4layers-mae.h5"
 GRAPH_NAME = f"figures/{MODEL_NAME.split('/')[-1].split('.')[0]}-graph.png"
 
 if os.path.isfile(MODEL_NAME):
@@ -79,10 +79,9 @@ model.add(layers.Dense(1024, activation='relu', input_shape=(1 + (1+2*6) * 64,))
 model.add(layers.Dense(1024, activation='relu'))
 model.add(layers.Dense(1024, activation='relu'))
 model.add(layers.Dense(1024, activation='relu'))
-model.add(layers.Dense(1024, activation='relu'))
 model.add(layers.Dense(1, activation='sigmoid'))
 
-model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+model.compile(optimizer='adam', loss='mae', metrics=['mae'])
 
 model.summary()
 

@@ -11,7 +11,7 @@ from tensorflow.keras import layers, models
 
 print("TensorFlow version: ", tf.__version__)
 
-MODEL_NAME = "models/15Mtrain-512-4layers-2048batch.h5"
+MODEL_NAME = "models/15Mtrain-1024-4layers-mae.h5"
 
 GRAPH_NAME = f"figures/{MODEL_NAME.split('/')[-1].split('.')[0]}-graph.png"
 
@@ -23,9 +23,6 @@ MODEL_INPUT = "npy_files/20M_neural_input/{file}"
 MODEL_OUTPUT = "npy_files/20M_neural_output/{file}"
 
 TENSORBOARD = True
-
-# TOTAL_DATA_SIZE = 16_000_000
-# AMOUNT_OF_FILES = 16
 
 TOTAL_DATA_SIZE = 20_000_000
 AMOUNT_OF_FILES = 40

@@ -29,7 +29,7 @@ export default {
     },
   },
   async created() {
-    loadModel("20mevaltrain-1024neurons-4layers")
+    loadModel("20mevaltrain-1024neurons-4layers-mae")
       .then(model => {
         this.model = model;
         this.updateEvaluation();
