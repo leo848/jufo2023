@@ -1,14 +1,21 @@
 <template>
-  <v-progress-linear
-    v-if="model"
-    v-model="evaluation"
-    :max="1.0"
-    :min="0.0"
-    color="white"
-    background-color="black"
-    height="20"
-    rounded
-  />
+  <v-tooltip location="bottom">
+    <p class="text-h4">{{ display(evaluation) }}</p>
+    <template v-slot:activator="{ props }">
+      <v-progress-linear
+        v-model="displayEvaluation"
+        :max="1.0"
+        :min="0.0"
+        color="white"
+        background-color="black"
+        height="20"
+        :indeterminate="model === null"
+        class="rounded-xl mt-4"
+        v-bind="props"
+        >
+      </v-progress-linear>
+    </template>
+  </v-tooltip>
 </template>
 
 <script lang="ts">
@@ -28,8 +35,8 @@ export default {
       required: true,
     },
   },
-  async created() {
-    loadModel("20mevaltrain-1024neurons-4layers-mae")
+  created() {
+    loadModel("20mevaltrain-1024neurons-4layers")
       .then(model => {
         this.model = model;
         this.updateEvaluation();
@@ -40,6 +47,13 @@ export default {
       this.updateEvaluation();
     }
   },
+  computed: {
+    displayEvaluation(): number {
+      if (this.evaluation >= 1) return 1;
+      if (this.evaluation <= 0) return 0;
+      return this.sigmoid(this.logit(this.evaluation), 3 / 5)
+    }
+  },
   methods: {
     updateEvaluation() {
       if (!this.model) {
@@ -48,6 +62,24 @@ export default {
       const positionalInput = fenToStandardPositionalInput(this.fen);
       const evaluation = this.model.predict(positionalInput);
       this.evaluation = evaluationOutputToEvaluation(evaluation);
+    },
+    logit(x: number): number {
+      return Math.log(x / (1 - x));
+    },
+    sigmoid(x: number, slope: number = 1): number {
+      return 1 / (1 + Math.exp(-slope * x));
+    },
+    display(evaluation: number): string {
+      const logit = this.logit(evaluation);
+      const numberFormat = new Intl.NumberFormat(undefined, {
+        maximumFractionDigits: 2,
+        signDisplay: "always",
+      });
+      if (isNaN(logit)) {
+        if (evaluation <= 0) return numberFormat.format(-Infinity);
+        if (evaluation >= 1) return numberFormat.format(Infinity);
+      }
+      return numberFormat.format(logit);
     }
   }
 }

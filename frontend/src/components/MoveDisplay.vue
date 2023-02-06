@@ -77,7 +77,7 @@ export default {
       if (showOnlyLegalMoves) {
         moves = moves.filter((move) => move.inner);
       }
-      return this.moves.slice(0, maxMoves);
+      return moves.slice(0, maxMoves);
     },
   },
   methods: {

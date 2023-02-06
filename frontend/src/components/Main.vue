@@ -189,13 +189,14 @@ export default {
       if (this.model === null) return;
       const input = game.fen();
       const output = this.model.predict(fenToStandardPositionalInput(input));
+      let outputMoves = completeOutputToMoves(output);
 
       const { maxMoves, onlyShowLegalMoves } = loadSettings();
 
       let amount = 500;
       let moves: (MoveWithAct & { inner: null | Move; index: number })[] = [];
       while (moves.length < maxMoves && amount <= 10000) {
-        moves = completeOutputToMoves(output)
+        moves = outputMoves
           .slice(0, amount)
           .map((obj, index) => ({
             ...obj,
