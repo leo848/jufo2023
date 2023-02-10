@@ -191,8 +191,11 @@ export default {
   },
   methods: {
     save() {
-      if (this.settings.autoPlay.white && !this.settings.autoPlay.black) {
+      if (this.settings.autoPlay.white) {
         this.settings.orientation = "black";
+      }
+      if (this.settings.autoPlay.black) {
+        this.settings.orientation = "white";
       }
       saveSettings(this.settings);
       this.$emit("save");

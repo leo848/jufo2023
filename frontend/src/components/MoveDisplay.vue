@@ -13,7 +13,23 @@
           variant="plain"
           class="mb-0"
         />
-        Legale Ausgaben: {{ (legals * 100).toFixed(2) }}%
+        Legale Ausgaben:
+        <v-tooltip right open-on-click="true">
+          <p class="text-h4">
+            {{ displayLegals }}
+          </p>
+          <template v-slot:activator="{ props }">
+            <v-progress-circular
+              :model-value="legals * 100"
+              color="green"
+              bg-color="red"
+              width="8"
+              size="large"
+              class="ml-4"
+              v-bind="props"
+            />
+          </template>
+        </v-tooltip>
       </p>
     </v-col>
     <transition-group name="moves">
@@ -80,6 +96,14 @@ export default {
       }
       return moves.slice(0, maxMoves);
     },
+    displayLegals() {
+      const numberFormat = new Intl.NumberFormat(undefined, {
+        style: "percent",
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 2,
+      });
+      return numberFormat.format(this.legals);
+    }
   },
   methods: {
     interpolate: (t: number) => (x: number) =>
