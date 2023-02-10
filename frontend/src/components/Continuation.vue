@@ -11,7 +11,7 @@
 import { Chessground } from "chessground";
 import type { Api } from "chessground/api";
 
-import { loadModel, type Model } from "@/neural-models/model";
+import { loadPlayModel, type Model } from "@/neural-models/model";
 import { completeOutputToMoves, fenToStandardPositionalInput } from '@/neural-models/chess_conversions';
 import type { Key } from 'chessground/types';
 import type { CompleteOutput, StandardPositionalInput } from '@/neural-models/types';
@@ -31,13 +31,11 @@ export default {
     chess: null as Chess | null,
   }),
   created() {
-    console.log("model is " + loadSetting("model"));
-    loadModel(loadSetting("model"))
+    loadPlayModel(loadSetting("playModelName"))
       .then(model => this.model = model)
       .then(() => setTimeout(this.nextMove, 1000))
   },
   async mounted() {
-    // this.model = await loadModel("15mtrain-512neurons-4layers");
     const options = {
       fen: this.fen,
       orientation: "white",

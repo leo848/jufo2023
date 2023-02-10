@@ -3,7 +3,7 @@
     <v-row>
       <v-col cols="12" sm="8" md="6" lg="4">
         <div ref="board" id="chessground-main"></div>
-        <Evaluation :fen="fen" v-if="!gameOver" class="mt-4"/>
+        <Evaluation :fen="fen" v-if="show.evaluation && !gameOver" class="mt-4"/>
         <CapturedPieces v-if="show.capturedPieces && !gameOver" :fen="fen" class="mt-2"/>
       </v-col>
       <v-col cols="12" sm="4" lg="3">
@@ -36,14 +36,13 @@ import Continuation from "@/components/Continuation.vue";
 import Evaluation from "@/components/Evaluation.vue";
 import CapturedPieces from "@/components/CapturedPieces.vue";
 
-import type { Model } from "@/neural-models/model";
+import { loadPlayModel, type Model } from "@/neural-models/model";
 import type {
   CompleteOutput,
   MoveWithAct,
   StandardPositionalInput,
 } from "@/neural-models/types";
 
-import { loadModel } from "@/neural-models/model";
 import {
   completeOutputToMoves,
   fenToStandardPositionalInput,
@@ -70,7 +69,7 @@ export default {
     CapturedPieces,
   },
   created() {
-    loadModel(loadSetting("model"))
+    loadPlayModel(loadSetting("playModelName"))
       .then((m) => (this.model = m))
       .then(this.update);
   },

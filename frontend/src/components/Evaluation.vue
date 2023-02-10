@@ -19,9 +19,10 @@
 </template>
 
 <script lang="ts">
-import { loadModel, type Model } from '@/neural-models/model';
+import { loadEvaluationModel, type Model } from '@/neural-models/model';
 import type { StandardPositionalInput, Evaluation } from '@/neural-models/types';
 import { fenToStandardPositionalInput, evaluationOutputToEvaluation } from '@/neural-models/chess_conversions';
+import { loadSetting } from '@/settings/settings';
 
 export default {
   name: 'Evaluation',
@@ -36,7 +37,7 @@ export default {
     },
   },
   created() {
-    loadModel("20mevaltrain-1024neurons-4layers")
+    loadEvaluationModel(loadSetting("evaluationModelName"))
       .then(model => {
         this.model = model;
         this.updateEvaluation();

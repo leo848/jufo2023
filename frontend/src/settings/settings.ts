@@ -1,4 +1,4 @@
-import {defaultModel, type EvaluationModelName, type PlayModelName} from "@/neural-models/model";
+import type {EvaluationModelName, PlayModelName} from "@/neural-models/model";
 import type { PieceTheme } from "../chess/loadPieces";
 
 type Settings = {
@@ -9,6 +9,7 @@ type Settings = {
     continuation: boolean,
     capturedPieces: boolean,
     neuralOutput: boolean,
+    evaluation: boolean,
   }
   maxMoves: number,
   autoPlay: {
@@ -33,6 +34,7 @@ const defaultSettings: Settings = {
     continuation: false,
     capturedPieces: true,
     neuralOutput: true,
+    evaluation: true,
   },
   temperature: 0.5,
   playModelName: "20mmatestrain-512neurons-4layers-2",

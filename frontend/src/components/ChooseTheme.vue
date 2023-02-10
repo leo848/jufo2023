@@ -9,7 +9,7 @@
         <v-col cols="3" v-for="theme, index in themes" :key="theme">
           <v-tooltip :text="theme" location="top">
             <template v-slot:activator="{ props }">
-              <v-card @click="select(theme)" class="ma-0 pa-0">
+              <v-card @click="select(theme)" class="ma-0 pa-0" :color="oldTheme == theme ? 'primary' : null">
                 <v-img :src="loadPiece(piece(index), theme)" v-bind="props"/>
               </v-card>
             </template>
@@ -31,6 +31,9 @@ export default {
   },
   unmounted() {
     clearInterval(this.interval);
+  },
+  props: {
+    oldTheme: String,
   },
   data: () => ({
     ticks: 0,
