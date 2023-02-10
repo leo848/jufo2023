@@ -20,46 +20,6 @@
               ></span
             >
           </v-col>
-          <v-col cols="12" md="6">
-            <v-switch
-              :disabled="!settings.show.neuralOutput"
-              v-model="settings.onlyShowLegalMoves"
-              color="primary"
-              label="Nur legale Züge anzeigen"
-              density="compact"
-            />
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-switch
-              :disabled="!settings.show.neuralOutput"
-              v-model="settings.showActivation"
-              color="primary"
-              label="Neuronale Aktivierung zeigen"
-              density="compact"
-            />
-          </v-col>
-          <v-col cols="12">
-            <v-slider
-              :disabled="!settings.show.neuralOutput"
-              v-model="settings.maxMoves"
-              :min="1"
-              :max="20"
-              :step="1"
-              thumb-label
-              label="Maximale angezeigte Züge"
-            >
-              <template v-slot:append>
-                <v-text-field
-                  v-model="settings.maxMoves"
-                  hide-details
-                  single-line
-                  density="compact"
-                  type="number"
-                  style="width: 70px"
-                ></v-text-field>
-              </template>
-            </v-slider>
-          </v-col>
           <v-col cols="12" md="5">
             <p class="mb-2">Automatisch spielen für:</p>
 
@@ -129,6 +89,49 @@
                   density="compact"
                   type="number"
                   style="width: 90px"
+                ></v-text-field>
+              </template>
+            </v-slider>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-switch
+              v-if="settings.show.neuralOutput"
+              :disabled="!settings.show.neuralOutput"
+              v-model="settings.onlyShowLegalMoves"
+              color="primary"
+              label="Nur legale Züge anzeigen"
+              density="compact"
+            />
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-switch
+              v-if="settings.show.neuralOutput"
+              :disabled="!settings.show.neuralOutput"
+              v-model="settings.showActivation"
+              color="primary"
+              label="Neuronale Aktivierung zeigen"
+              density="compact"
+            />
+          </v-col>
+          <v-col cols="12">
+            <v-slider
+              v-if="settings.show.neuralOutput"
+              :disabled="!settings.show.neuralOutput"
+              v-model="settings.maxMoves"
+              :min="1"
+              :max="20"
+              :step="1"
+              thumb-label
+              label="Maximale angezeigte Züge"
+            >
+              <template v-slot:append>
+                <v-text-field
+                  v-model="settings.maxMoves"
+                  hide-details
+                  single-line
+                  density="compact"
+                  type="number"
+                  style="width: 70px"
                 ></v-text-field>
               </template>
             </v-slider>
