@@ -1,4 +1,4 @@
-import {defaultModel} from "@/neural-models/model";
+import {defaultModel, type EvaluationModelName, type PlayModelName} from "@/neural-models/model";
 import type { PieceTheme } from "../chess/loadPieces";
 
 type Settings = {
@@ -16,7 +16,8 @@ type Settings = {
     white: boolean,
   }
   temperature: number,
-  model: typeof defaultModel,
+  playModelName: PlayModelName,
+  evaluationModelName: EvaluationModelName,
 }
 
 const defaultSettings: Settings = {
@@ -34,10 +35,11 @@ const defaultSettings: Settings = {
     neuralOutput: true,
   },
   temperature: 0.5,
-  model: defaultModel,
+  playModelName: "20mmatestrain-512neurons-4layers-2",
+  evaluationModelName: "20mevaltrain-1024neurons-4layers",
 } as const;
 
-let settings: Settings = { ...defaultSettings };
+let settings: Settings = Object.assign({}, defaultSettings, JSON.parse(localStorage.getItem("settings") || "{}"));
 
 export function loadSettings(): Settings {
   // Defensive deep copy
@@ -52,11 +54,13 @@ export function loadSetting<K extends keyof Settings>(key: K): Settings[K] {
 }
 
 export function saveSettings(newSettings: Settings): void {
-  settings = newSettings;
+  settings = deepCopy(newSettings);
+  localStorage.setItem("settings", JSON.stringify(settings));
 }
 
 export function resetSettings(): void {
   settings = { ...defaultSettings };
+  localStorage.setItem("settings", "{}");
 }
 
 function deepCopy<T>(obj: T): T {
