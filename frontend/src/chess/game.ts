@@ -2,6 +2,8 @@ import {Chess, type Square} from "chess.js";
 
 export let game = new Chess();
 
+window["_game" as any] = game as any;
+
 const events: Record<number, ((game: Chess) => void)> = {};
 
 let number = 69;

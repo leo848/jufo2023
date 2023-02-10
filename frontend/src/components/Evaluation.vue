@@ -72,6 +72,7 @@ export default {
     display(evaluation: number): string {
       const logit = this.logit(evaluation);
       const numberFormat = new Intl.NumberFormat(undefined, {
+        minimumFractionDigits: 2,
         maximumFractionDigits: 2,
         signDisplay: "always",
       });

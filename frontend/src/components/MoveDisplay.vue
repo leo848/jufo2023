@@ -3,15 +3,16 @@
     <v-col cols="12">
       <p class="text-h5">
         Zugvorschläge des Modells
+      </p>
+      <p class="text-body-2">
         <v-btn
           :icon="movesShown ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
           @click="showAll"
           @blur="movesShown && showAll"
           :color="movesShown ? 'white' : null"
           variant="plain"
+          class="mb-0"
         />
-      </p>
-      <p class="text-body-2">
         Legale Ausgaben: {{ (legals * 100).toFixed(2) }}%
       </p>
     </v-col>
