@@ -15,7 +15,8 @@ type Settings = {
   autoPlay: {
     black: boolean,
     white: boolean,
-  }
+  },
+  orientation: "white" | "black",
   temperature: number,
   playModelName: PlayModelName,
   evaluationModelName: EvaluationModelName,
@@ -36,8 +37,9 @@ const defaultSettings: Settings = {
     neuralOutput: true,
     evaluation: true,
   },
+  orientation: "white",
   temperature: 0.5,
-  playModelName: "20mmatestrain-512neurons-4layers-2",
+  playModelName: "20mmatestrain-512neurons-4layers-1024batch",
   evaluationModelName: "20mevaltrain-1024neurons-4layers",
 } as const;
 

@@ -4,6 +4,20 @@
     <v-card-text>
       <v-container>
         <v-row>
+          <v-col cols="12" sm="6">
+            <v-select
+              v-model="settings.playModelName"
+              :items="playModelNames"
+              label="Neuronales Modell"
+            />
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-select
+              v-model="settings.evaluationModelName"
+              :items="evaluationModelNames"
+              label="Modell zur Evaluierung"
+            />
+          </v-col>
           <v-col cols="12">
             <v-menu v-model="pieceThemeMenu" :close-on-content-click="false">
               <template v-slot:activator="{ props }">
@@ -150,6 +164,7 @@
 
 <script lang="ts">
 import { loadSettings, saveSettings } from "@/settings/settings";
+import { playModelNames, evaluationModelNames } from "@/neural-models/model";
 import {
   loadPiece,
   themes,
@@ -166,6 +181,8 @@ export default {
     settings: loadSettings(),
     themes: themes,
     pieceThemeMenu: false,
+    playModelNames,
+    evaluationModelNames,
   }),
   computed: {
     license() {
@@ -174,6 +191,9 @@ export default {
   },
   methods: {
     save() {
+      if (this.settings.autoPlay.white && !this.settings.autoPlay.black) {
+        this.settings.orientation = "black";
+      }
       saveSettings(this.settings);
       this.$emit("save");
     },

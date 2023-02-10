@@ -15,23 +15,29 @@ export interface Model<I, O> {
 type ModelInput<M> = M extends Model<infer I, any> ? I : never;
 type ModelOutput<M> = M extends Model<any, infer O> ? O : never;
 
-export type PlayModelName =
-  | "complete-model"
-  | "3m-unique-rust-model"
-  | "15m-unique-model"
-  | "puzzletrain-512neurons-4layers"
-  | "15mtrain-512neurons-4layers"
-  | "15mtrain-512neurons-4layers-2"
-  | "15mtrain-724neurons-4layers"
-  | "15mrevtrain-724neurons-4layers"
-  | "20mmatestrain-512neurons-4layers"
-  | "20mmatestrain-512neurons-4layers-2"
-  | "15mtrain-512neurons-4layers-1024batch";
+export const playModelNames = [
+  "complete-model",
+  "3m-unique-rust-model",
+  "15m-unique-model",
+  "puzzletrain-512neurons-4layers",
+  "15mtrain-512neurons-4layers",
+  "15mtrain-512neurons-4layers-2",
+  "15mtrain-724neurons-4layers",
+  "15mrevtrain-724neurons-4layers",
+  "20mmatestrain-512neurons-4layers",
+  "20mmatestrain-512neurons-4layers-1024batch",
+  "15mtrain-512neurons-4layers-1024batch",
+] as const;
 
-export type EvaluationModelName =
-  | "20mevaltrain-512neurons-4layers"
-  | "20mevaltrain-1024neurons-4layers"
-  | "20mevaltrain-1024neurons-4layers-mae";
+export type PlayModelName = typeof playModelNames[number];
+
+export const evaluationModelNames = [
+  "20mevaltrain-512neurons-4layers",
+  "20mevaltrain-1024neurons-4layers",
+  "20mevaltrain-1024neurons-4layers-mae",
+] as const;
+
+export type EvaluationModelName = typeof evaluationModelNames[number];
 
 export type Models = {
   original: Model<StandardPositionalInput, FromToOutput>;

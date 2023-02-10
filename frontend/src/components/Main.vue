@@ -113,6 +113,7 @@ export default {
         enabled: true,
         duration: 500,
       },
+      orientation: loadSetting("orientation"),
     };
 
     if (!(this.$refs.board instanceof HTMLElement))
