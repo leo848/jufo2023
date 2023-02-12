@@ -52,7 +52,7 @@ impl Visitor for NeuralInputCreator {
             .play_unchecked(&san_plus.san.to_move(&self.board).expect("invalid move"));
 
         // self.board
-            // .play_unchecked(&san_plus.san.to_move(&self.board).expect("invalid move"));
+        // .play_unchecked(&san_plus.san.to_move(&self.board).expect("invalid move"));
         // dbg!(&self.board.board());
     }
 

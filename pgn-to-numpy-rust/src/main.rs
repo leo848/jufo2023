@@ -10,7 +10,7 @@ mod pgn_to_numpy_eval;
 
 pub use common::*;
 
-const ACTION: Action = Action::PgnToEvalNpy;
+const ACTION: Action = Action::PgnToNpy;
 
 #[derive(Debug, Clone, Copy, IsVariant)]
 #[allow(dead_code)]

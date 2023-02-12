@@ -27,6 +27,9 @@ export const playModelNames = [
   "20mmatestrain-512neurons-4layers",
   "20mmatestrain-512neurons-4layers-1024batch",
   "15mtrain-512neurons-4layers-1024batch",
+  "12Mopenings",
+  "14Mmiddlegame",
+  "15Mendgame",
 ] as const;
 
 export type PlayModelName = typeof playModelNames[number];
@@ -39,48 +42,28 @@ export const evaluationModelNames = [
 
 export type EvaluationModelName = typeof evaluationModelNames[number];
 
+// prettier-ignore
 export type Models = {
-  original: Model<StandardPositionalInput, FromToOutput>;
+  "original": Model<StandardPositionalInput, FromToOutput>;
   "vertical-model": Model<StandardPositionalInput, FromToOutput>;
   "ole-model": Model<StandardPositionalInput, FromToOutput>;
   "complete-model": Model<StandardPositionalInput, CompleteOutput>;
   "3m-unique-rust-model": Model<StandardPositionalInput, CompleteOutput>;
   "15m-unique-model": Model<StandardPositionalInput, CompleteOutput>;
-  "puzzletrain-512neurons-4layers": Model<
-    StandardPositionalInput,
-    CompleteOutput
-  >;
+  "puzzletrain-512neurons-4layers": Model<StandardPositionalInput, CompleteOutput>;
   "15mtrain-512neurons-4layers": Model<StandardPositionalInput, CompleteOutput>;
-  "15mtrain-512neurons-4layers-2": Model<
-    StandardPositionalInput,
-    CompleteOutput
-  >;
+  "15mtrain-512neurons-4layers-2": Model<StandardPositionalInput, CompleteOutput>;
   "15mtrain-724neurons-4layers": Model<StandardPositionalInput, CompleteOutput>;
-  "15mrevtrain-724neurons-4layers": Model<
-    StandardPositionalInput,
-    CompleteOutput
-  >;
-  "20mmatestrain-512neurons-4layers": Model<
-    StandardPositionalInput,
-    CompleteOutput
-  >;
-  "20mmatestrain-512neurons-4layers-2": Model<
-    StandardPositionalInput,
-    CompleteOutput
-  >;
-  "15mtrain-512neurons-4layers-1024batch": Model<
-    StandardPositionalInput,
-    CompleteOutput
-  >;
+  "15mrevtrain-724neurons-4layers": Model<StandardPositionalInput, CompleteOutput>;
+  "20mmatestrain-512neurons-4layers": Model<StandardPositionalInput, CompleteOutput>;
+  "20mmatestrain-512neurons-4layers-2": Model<StandardPositionalInput, CompleteOutput>;
+  "15mtrain-512neurons-4layers-1024batch": Model<StandardPositionalInput, CompleteOutput>;
   "20mevaltrain-512neurons-4layers": Model<StandardPositionalInput, Evaluation>;
-  "20mevaltrain-1024neurons-4layers": Model<
-    StandardPositionalInput,
-    Evaluation
-  >;
-  "20mevaltrain-1024neurons-4layers-mae": Model<
-    StandardPositionalInput,
-    Evaluation
-  >;
+  "20mevaltrain-1024neurons-4layers": Model<StandardPositionalInput, Evaluation>;
+  "20mevaltrain-1024neurons-4layers-mae": Model<StandardPositionalInput, Evaluation>;
+  "12Mopenings": Model<StandardPositionalInput, CompleteOutput>;
+  "14Mmiddlegame": Model<StandardPositionalInput, CompleteOutput>;
+  "15Mendgame": Model<StandardPositionalInput, CompleteOutput>;
 };
 
 export const defaultModel = "20mmatestrain-512neurons-4layers-2";
