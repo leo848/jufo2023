@@ -22,14 +22,14 @@ from tensorflow.keras import models
 
 # print(f"Accuracy: {accuracy * 100.0:.2f}%")
 
-def data_generator(stage):
+def data_generator(stage, count):
     path = {
         "openings": "15M_openings_neural",
         "middlegame": "15M_middlegame_neural",
         "endgame": "15M_endgame_neural",
         "default": "20M_neural",
     }[stage]
-    test_x, test_y = np.load(f"npy_files/{path}_input/1.npy", mmap_mode="r"), np.load(f"npy_files/{path}_output/1.npy", mmap_mode="r")
+    test_x, test_y = np.load(f"npy_files/{path}_input/{count}.npy", mmap_mode="r"), np.load(f"npy_files/{path}_output/{count}.npy", mmap_mode="r")
     BATCH = 1024
     for i in range(0, len(test_x), BATCH):
         yield test_x[i:i+BATCH], tf.keras.utils.to_categorical(test_y[i:i+BATCH], num_classes=4096)
@@ -46,24 +46,25 @@ def load_model(stage):
         "default": "mates-20Mtrain-512-4layers-2",
     }[stage]
     model = models.load_model(f"models/{path}.h5")
-    print(f"Loaded {stage} model")
     return model
 
 
 accuracies = {}
 
-for data in ["openings", "middlegame", "endgame", "default"]:
-    for model in ["openings", "middlegame", "endgame", "default"]:
-        print(f"Testing {model} on {data} data")
-        # Calculate the accuracy of the model on the test data
-        loss, accuracy = load_model(model).evaluate(data_generator(data), verbose=True)
-        accuracies[model, data] = accuracy
+for count in range(2, 16, 4):
+    print(f"Testing on {count} data", file=sys.stderr)
+    for data in ["openings", "middlegame", "endgame", "default"]:
+        for model in ["openings", "middlegame", "endgame", "default"]:
+            print(f"Testing {model} on {data} data", file=sys.stderr)
+            # Calculate the accuracy of the model on the test data
+            loss, accuracy = load_model(model).evaluate(data_generator(data, count), verbose=True)
+            accuracies[count, model, data] = accuracy
 
-        print(f"Accuracy: {accuracy * 100.0:.2f}%")
+            print(f"\tAccuracy: {accuracy * 100.0:.2f}%", file=sys.stderr)
 
-        gc.collect()
+            gc.collect()
 
-print("\n\n=== Results ===")
+print("\n\n=== Results ===", file=sys.stderr)
 
-for key, data in accuracies:
-    print(f"Model {key} on {data} data:\n\t{accuracies[key, data] * 100.0:.3f}%")
+for count, model, data in accuracies:
+    print(f"Count {count}: Model {model} on {data} data:\n\t{accuracies[model, data] * 100.0:.3f}%")
