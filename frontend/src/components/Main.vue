@@ -5,13 +5,13 @@
         <div ref="board" id="chessground-main"></div>
         <Evaluation :fen="fen" v-if="show.evaluation && !gameOver" class="mt-4"/>
       </v-col>
-      <v-col cols="12" sm="4" lg="3">
+      <v-col cols="12" sm="4" lg="3" v-if="show.neuralOutput || gameOver">
         <div v-if="gameOver">
           <GameOver @new="newGame" />
         </div>
-        <div v-else>
-          <MoveDisplay v-if="show.neuralOutput && model && !gameOver" :moves="moves" :legals="legals" @suggest="suggestMove" @showAll="showAll" />
-          <v-card v-else-if="show.neuralOutput && !gameOver" max-width="300px">
+        <div v-else-if="show.neuralOutput && !gameOver">
+          <MoveDisplay v-if="model" :moves="moves" :legals="legals" @suggest="suggestMove" @showAll="showAll" />
+          <v-card v-else max-width="300px">
             <v-card-title>Lade Modell...</v-card-title>
             <v-card-text>
               <v-progress-circular :size="50" :width="6" indeterminate />
