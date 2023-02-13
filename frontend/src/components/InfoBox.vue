@@ -1,7 +1,6 @@
 <template>
   <span class="ml-2">
     <v-menu max-width="350px">
-      <!-- background color black -->
       <v-card>
         <v-card-title class="text-h5">{{ title }}</v-card-title>
         <v-card-text class="text-body-1">{{ text }}</v-card-text>
@@ -66,7 +65,7 @@ const lookup = {
   "game-over": {
     title: "Spielende",
     template: "Eine Schachpartie kann durch viele verschiedene Gründe enden, aber es gibt immer drei Ausgänge: Schwarz gewinnt, Weiß gewinnt oder Remis (Unentschieden). Ein Gewinn kann durch ein Schachmatt oder durch vorzeitige Aufgabe eines Spielers entstehen, ein Remis durch Patt, ungenügendes Material oder dreimal die gleiche Stellung."
-  }
+  } as LookupResult,
 } as const;
 
 const keyValidator = (name: string): name is keyof typeof lookup =>
@@ -77,7 +76,7 @@ export default {
   props: {
     name: {
       type: String,
-      required: true,
+      required: false,
       validator: keyValidator,
     },
     templates: {
@@ -85,7 +84,7 @@ export default {
       required: false,
       default: () => ({}),
     },
-    directText: {
+    plain: {
       type: String,
       required: false,
       default: null,
@@ -96,8 +95,11 @@ export default {
   }),
   computed: {
     text(): string {
-      if (this.directText) {
-        return this.directText;
+      if (this.plain) {
+        return this.plain;
+      }
+      if (!this.name) {
+        throw new Error("No name");
       }
       if (!keyValidator(this.name)) {
         throw new Error(`Invalid key: ${this.name}`);
@@ -129,6 +131,9 @@ export default {
       );
     },
     title(): string {
+      if (!this.name) {
+        throw new Error("No name");
+      }
       if (!keyValidator(this.name)) {
         throw new Error(`Invalid key: ${this.name}`);
       }
