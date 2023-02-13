@@ -10,6 +10,7 @@ type Settings = {
     capturedPieces: boolean,
     neuralOutput: boolean,
     evaluation: boolean,
+    infoboxes: boolean,
   }
   maxMoves: number,
   autoPlay: {
@@ -36,6 +37,7 @@ const defaultSettings: Settings = {
     capturedPieces: true,
     neuralOutput: true,
     evaluation: true,
+    infoboxes: true,
   },
   orientation: "white",
   temperature: 0.5,

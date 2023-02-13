@@ -38,7 +38,7 @@
             <p class="mb-2">Automatisch spielen für:</p>
 
             <v-btn
-              @click="settings.autoPlay.white = !settings.autoPlay.white"
+              @click="autoPlay('white')"
               :color="settings.autoPlay.white ? 'primary' : null"
               class="mr-4"
               icon
@@ -47,7 +47,7 @@
               <img :src="loadPiece('wK')" class="button-piece" />
             </v-btn>
             <v-btn
-              @click="settings.autoPlay.black = !settings.autoPlay.black"
+              @click="autoPlay('black')"
               :color="settings.autoPlay.black ? 'primary' : null"
               icon
               size="x-large"
@@ -63,6 +63,7 @@
                 ['capturedPieces', 'material', 'Zeige den Materialunterschied an – welche Seite mehr Figuren hat'],
                 ['evaluation', 'evaluierung', 'Ein weiteres neuronales Netzwerk zeigt die aktuelle Bewertung des Spielfelds an.'],
                 ['continuation', 'fortsetzung', 'Wie würde das aktuell ausgewählte neuronale Netzwerk diese Partie für beide Seiten weiter spielen?'],
+                ['infoboxes', 'infofelder', 'Zeige überall verstreut ein paar Informationen an, so ähnlich wie diese hier.'],
               ]"
               :key="element"
             >
@@ -190,6 +191,12 @@ export default {
     },
   },
   methods: {
+    autoPlay(color: "white" | "black") {
+      this.settings.autoPlay[color] = !this.settings.autoPlay[color];
+      if (this.settings.autoPlay[color]) {
+        this.settings.autoPlay[color === "black" ? "white" : "black"] = false;
+      }
+    },
     save() {
       if (this.settings.autoPlay.white) {
         this.settings.orientation = "black";

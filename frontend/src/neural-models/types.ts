@@ -6,6 +6,9 @@
 // The second one is 1.0 if the field is occupied by a white pawn, 0.0 else.
 // The third one is 1.0 if the field is occupied by a white knight, 0.0 else.
 // ...
+
+import type {Move} from "chess.js";
+
 // The twelfth one is 1.0 if the field is occupied by a black king, 0.0 else.
 export type StandardPositionalInput = Float32Array & { length: 833 } & {
   readonly __tag: unique symbol;
@@ -29,4 +32,4 @@ export type Evaluation = Float32Array & { length: 1 } & {
   readonly __tag: unique symbol;
 };
 
-export type MoveWithAct = { from: string; to: string; act: number };
+export type MoveWithAct = { from: string, to: string, act: number, inner ?: Move, index ?: number };

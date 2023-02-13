@@ -2,7 +2,7 @@
   <v-row>
     <v-col cols="12">
       <p class="text-h5">
-        Zugvorschläge des Modells
+        Zugvorschläge des Modells <InfoBox name="move-suggestions" />
       </p>
       <p class="text-body-2">
         <v-btn
@@ -14,7 +14,7 @@
           class="mb-0"
         />
         Legale Ausgaben:
-        <v-tooltip right open-on-click="true">
+        <v-tooltip right :open-on-click="true">
           <p class="text-h4">
             {{ displayLegals }}
           </p>
@@ -30,6 +30,7 @@
             />
           </template>
         </v-tooltip>
+        <InfoBox class="ml-2" name="legal-outputs" :templates="{ percentage: (legals * 100).toFixed(2) }" />
       </p>
     </v-col>
     <transition-group name="moves">
@@ -64,6 +65,7 @@
               {{ move.act.toFixed(4).slice(1) }}<br />
               <div v-if="showIndex" class="mt-n2">#{{ move.index }}</div>
             </div>
+            <InfoBox name="move-display" :templates="{ move }" />
           </div>
         </v-card>
       </v-col></transition-group
@@ -78,8 +80,13 @@ import { move } from "@/chess/game";
 import { loadSetting } from "@/settings/settings";
 import type { MoveWithAct } from "@/neural-models/types";
 
+import InfoBox from "@/components/InfoBox.vue";
+
 export default {
   name: "MoveDisplay",
+  components: {
+    InfoBox,
+  },
   data: () => ({
     gray: "grey lighten-3",
     showIndex: loadSetting("onlyShowLegalMoves"),

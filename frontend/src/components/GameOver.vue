@@ -1,6 +1,8 @@
 <template>
   <v-card>
-    <v-card-title class="text-h5">{{ gameOverString() }}</v-card-title>
+    <v-card-title class="text-h5"
+      >{{ gameOverString() }}<InfoBox name="game-over"
+    /></v-card-title>
     <v-card-text class="mt-4 mb-4">
       <p class="text-h2 mb-4 font-weight-bold" v-html="result" />
       <p class="mb-2" v-html="winPieceIcons" />
@@ -21,7 +23,9 @@
           </v-card-text>
         </v-slide-y-transition>
       </v-card>
-      <v-btn size="x-large" class="mt-6 rainbow-btn" @click="newGame">Neues Spiel</v-btn>
+      <v-btn size="x-large" class="mt-6 rainbow-btn" @click="newGame"
+        >Neues Spiel</v-btn
+      >
     </v-card-text>
   </v-card>
 </template>
@@ -31,12 +35,17 @@ import { game, resetGame } from "@/chess/game";
 import { getStatus, translateReason } from "@/chess/status";
 import { loadPiece } from "@/chess/loadPieces";
 
+import InfoBox from "@/components/InfoBox.vue";
+
 export default {
   data: () => ({
     game,
     status: getStatus(game),
     showPgn: false,
   }),
+  components: {
+    InfoBox,
+  },
   computed: {
     result() {
       if (this.status.result === "1-0") {
@@ -79,11 +88,11 @@ export default {
       } else {
         strings.push("Unentschieden!", "Remis!");
       }
-      return strings[Math.random() * strings.length | 0]
+      return strings[(Math.random() * strings.length) | 0];
     },
     translateReason,
   },
-  emits: [ "new" ]
+  emits: ["new"],
 };
 </script>
 
