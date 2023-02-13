@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span class="ml-2">
     <v-menu max-width="350px">
       <!-- background color black -->
       <v-card>
