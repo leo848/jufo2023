@@ -52,10 +52,9 @@ export default {
   mounted() {
     const professionalGradients = [
       ["#872A97", "#3F51B5"],
-      ["#F44336", "#FFEB3B"],
       ["#EEAB3B", "#F44336"],
       ["#3F51B5", "#872A97"],
-    ];
+    ] as const;
     const randomGradient =
       professionalGradients[
         Math.floor(Math.random() * professionalGradients.length)
