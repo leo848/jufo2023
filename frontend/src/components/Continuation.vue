@@ -33,7 +33,7 @@ export default {
   created() {
     loadPlayModel(loadSetting("playModelName"))
       .then(model => this.model = model)
-      .then(() => setTimeout(this.nextMove, 1000))
+      .then(() => setTimeout(this.nextMove, 1500))
   },
   async mounted() {
     const options = {
@@ -66,7 +66,7 @@ export default {
       if (this.chess!.isGameOver()) {
         return;
       }
-      setTimeout(this.nextMove, 200);
+      setTimeout(this.nextMove, 500);
     }
   }
 }
