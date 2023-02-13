@@ -17,8 +17,8 @@
           <span>Quellcode</span>
         </v-tooltip>
       </v-btn>
-      <v-btn icon>
-        <v-icon>mdi-cog</v-icon>
+      <v-btn icon class="mx-4">
+        <v-icon size="large">mdi-cog</v-icon>
         <v-dialog v-model="dialog" activator="parent" max-width="800px">
           <SettingsDialog @cancel="cancel" @save="save" />
         </v-dialog>
