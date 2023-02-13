@@ -29,7 +29,7 @@ const _defaultSettings: Settings = {
   showActivation: true,
   maxMoves: 8,
   autoPlay: {
-    black: false,
+    black: true,
     white: false,
   },
   show: {
