@@ -37,6 +37,8 @@ export type PlayModelName = typeof playModelNames[number];
 export const evaluationModelNames = [
   "20mevaltrain-512neurons-4layers",
   "20mevaltrain-1024neurons-4layers",
+  "20mevaltrain-512neurons-5layers",
+  "20mevaltrain-1024neurons-5layers",
   "20mevaltrain-1024neurons-4layers-mae",
 ] as const;
 
@@ -60,6 +62,8 @@ export type Models = {
   "15mtrain-512neurons-4layers-1024batch": Model<StandardPositionalInput, CompleteOutput>;
   "20mevaltrain-512neurons-4layers": Model<StandardPositionalInput, Evaluation>;
   "20mevaltrain-1024neurons-4layers": Model<StandardPositionalInput, Evaluation>;
+  "20mevaltrain-512neurons-5layers": Model<StandardPositionalInput, Evaluation>;
+  "20mevaltrain-1024neurons-5layers": Model<StandardPositionalInput, Evaluation>;
   "20mevaltrain-1024neurons-4layers-mae": Model<StandardPositionalInput, Evaluation>;
   "12Mopenings": Model<StandardPositionalInput, CompleteOutput>;
   "14Mmiddlegame": Model<StandardPositionalInput, CompleteOutput>;
