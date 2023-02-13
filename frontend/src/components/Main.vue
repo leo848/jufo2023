@@ -4,7 +4,6 @@
       <v-col cols="12" sm="8" md="6" lg="4">
         <div ref="board" id="chessground-main"></div>
         <Evaluation :fen="fen" v-if="show.evaluation && !gameOver" class="mt-4"/>
-        <CapturedPieces v-if="show.capturedPieces && !gameOver" :fen="fen" class="mt-2"/>
       </v-col>
       <v-col cols="12" sm="4" lg="3">
         <div v-if="gameOver">
@@ -20,10 +19,13 @@
           </v-card>
         </div>
       </v-col>
-      <v-col cols="12" sm="4" lg="3">
-        <div v-if="show.continuation && model && !gameOver">
+      <v-col cols="12" sm="4" lg="3" v-if="show.continuation && model && !gameOver">
+        <div>
           <Continuation :fen="fen" :key="fen"/>
         </div>
+      </v-col>
+      <v-col cols="6" sm="4" lg="3" v-if="show.capturedPieces && !gameOver">
+        <CapturedPieces :fen="fen" class="mt-2"/>
       </v-col>
     </v-row>
   </div>

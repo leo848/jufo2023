@@ -68,17 +68,17 @@
             >
               <v-btn
                 :color="settings.show[element] ? 'primary' : null"
+                @click="settings.show[element] = !settings.show[element]"
                 class="mr-4 mb-4"
               >
               <span
-                @click="settings.show[element] = !settings.show[element]"
                 >
                 {{ deutsch }}
               </span>
                 <span class="ml-3">
                   <v-tooltip :text="desc" max-width="250px">
                     <template v-slot:activator="{ props }">
-                      <v-icon v-bind="props">mdi-information</v-icon>
+                      <v-icon @click.stop v-bind="props">mdi-information</v-icon>
                     </template>
                   </v-tooltip>
                 </span>
