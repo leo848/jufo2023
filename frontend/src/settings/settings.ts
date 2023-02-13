@@ -23,7 +23,7 @@ type Settings = {
   evaluationModelName: EvaluationModelName,
 }
 
-const defaultSettings: Settings = {
+const _defaultSettings: Settings = {
   theme: "maestro",
   onlyShowLegalMoves: true,
   showActivation: true,
@@ -45,7 +45,7 @@ const defaultSettings: Settings = {
   evaluationModelName: "20mevaltrain-1024neurons-4layers",
 } as const;
 
-let settings: Settings = Object.assign({}, defaultSettings, JSON.parse(localStorage.getItem("settings") || "{}"));
+let settings: Settings = Object.assign({}, _defaultSettings, JSON.parse(localStorage.getItem("settings") || "{}"));
 
 export function loadSettings(): Settings {
   // Defensive deep copy
@@ -65,8 +65,12 @@ export function saveSettings(newSettings: Settings): void {
 }
 
 export function resetSettings(): void {
-  settings = { ...defaultSettings };
+  settings = { ..._defaultSettings };
   localStorage.setItem("settings", "{}");
+}
+
+export function defaultSettings(): Settings {
+  return deepCopy(_defaultSettings);
 }
 
 function deepCopy<T>(obj: T): T {

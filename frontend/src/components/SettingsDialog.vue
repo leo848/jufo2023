@@ -156,6 +156,7 @@
     </v-card-text>
     <v-spacer />
     <v-card-actions>
+      <v-btn @click="reset">Zurücksetzen</v-btn>
       <v-spacer />
       <v-btn @click="$emit('cancel')">Abbrechen</v-btn>
       <v-btn @click="save" variant="tonal" color="primary">Speichern</v-btn>
@@ -164,7 +165,7 @@
 </template>
 
 <script lang="ts">
-import { loadSettings, saveSettings } from "@/settings/settings";
+import { loadSettings, defaultSettings, saveSettings } from "@/settings/settings";
 import { playModelNames, evaluationModelNames } from "@/neural-models/model";
 import {
   loadPiece,
@@ -196,6 +197,9 @@ export default {
       if (this.settings.autoPlay[color]) {
         this.settings.autoPlay[color === "black" ? "white" : "black"] = false;
       }
+    },
+    reset() {
+      this.settings = defaultSettings();
     },
     save() {
       if (this.settings.autoPlay.white) {
