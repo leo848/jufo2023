@@ -1,6 +1,6 @@
 <template>
   <v-card max-width="400px">
-    <v-card-title>Wähle ein Theme aus</v-card-title>
+    <v-card-title>Wähle einen Figurenstil aus</v-card-title>
     <v-card-text>
       <v-row>
         <v-col cols="12">
