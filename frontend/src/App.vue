@@ -5,6 +5,12 @@
         >Wie kann Künstliche Intelligenz Schach lernen?</v-app-bar-title
       >
       <v-spacer></v-spacer>
+      <v-btn icon href="https://raw.githubusercontent.com/leo848/jufo2023/master/langfassung.pdf">
+        <v-icon>mdi-file-document-multiple</v-icon>
+        <v-tooltip activator="parent" location="bottom">
+          <span>Langfassung</span>
+        </v-tooltip>
+      </v-btn>
       <v-btn icon href="https://github.com/leo848/jufo2023">
         <v-icon>mdi-code-braces-box</v-icon>
         <v-tooltip activator="parent" location="bottom">
