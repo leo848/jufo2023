@@ -36,9 +36,9 @@ export default {
       .then(() => setTimeout(this.nextMove, 1500))
   },
   async mounted() {
-    const options = {
+    const config = {
       fen: this.fen,
-      orientation: "white",
+      orientation: loadSetting("orientation"),
       viewOnly: true,
       coordinates: false,
       resizable: false,
@@ -48,7 +48,7 @@ export default {
       },
     } as const;
 
-    this.cg = Chessground(this.$refs.board as HTMLElement, options);
+    this.cg = Chessground(this.$refs.board as HTMLElement, config);
     this.chess = new Chess(this.fen);
   },
   methods: {
