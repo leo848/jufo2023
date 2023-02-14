@@ -8,6 +8,7 @@
         :min="0.0"
         color="white"
         background-color="black"
+        :reverse="blackLeft"
         height="20"
         :indeterminate="model === null"
         class="rounded-xl mt-4"
@@ -29,6 +30,7 @@ export default {
   data: () => ({
     model: null as Model<StandardPositionalInput, Evaluation> | null,
     evaluation: 0.5,
+    blackLeft: loadSetting("orientation") === "black",
   }),
   props: {
     fen: {
