@@ -133,7 +133,7 @@ export default {
       // The color is a gradient from red to green.
       // It is red when the activation is 0 and green when the activation is 1.
       // The gradient is logarithmic.
-      let newAct = this.interpolate(25)(act);
+      let newAct = this.interpolate(20)(act);
       let red = Math.min(1.0, 2.0 - 2.0 * newAct) * 200;
       let green = Math.min(1.0, 2.0 * newAct) * 200;
 
