@@ -1,11 +1,10 @@
 use std::{
-    collections::hash_map::DefaultHasher,
     error::Error,
     fs::File,
-    hash::{Hash, Hasher},
     mem,
 };
 
+use clap::ArgMatches;
 use itertools::Itertools;
 use pgn_reader::{BufferedReader, SanPlus, Skip, Visitor};
 use shakmaty::{Board, Chess, Move, Position};
@@ -19,14 +18,6 @@ const ONLY_OPENINGS: bool = false;
 const ONLY_MIDDLE_GAME: bool = false;
 const ONLY_ENDGAME: bool = true;
 
-pub const AMOUNT_OF_BOARDS: usize = 15_000_000;
-pub const BOARDS_PER_FILE: usize = 500_000;
-pub const AMOUNT_OF_FILES: usize = AMOUNT_OF_BOARDS / BOARDS_PER_FILE;
-
-const NEURAL_INPUT_DIR: &str = "../npy_files/15M_endgame_neural_input";
-const NEURAL_OUTPUT_DIR: &str = "../npy_files/15M_endgame_neural_output";
-
-const PGN_FILE: &str = "database-2017-01.pgn";
 
 #[derive(Debug, Clone)]
 struct NeuralInputCreator {
@@ -133,8 +124,10 @@ fn material_count(board: &Board) -> usize {
             + board.pawns().count()
 }
 
-pub fn main(only_count: bool) -> Result<(), Box<dyn Error>> {
-    let pgn = File::open(PGN_FILE)?;
+pub fn main(options: &ArgMatches) -> Result<(), Box<dyn Error>> {
+    let pgn = File::open(
+        options.get_one::<String>("pgn-file").expect("required")
+    )?;
 
     let mut reader = BufferedReader::new(&pgn);
     let mut counter = NeuralInputCreator::new();
@@ -143,27 +136,7 @@ pub fn main(only_count: bool) -> Result<(), Box<dyn Error>> {
         .flatten()
         .flatten();
 
-    if only_count {
-        let count = io_pairs
-            .unique_by(|(i, _)| {
-                let mut hasher = DefaultHasher::new();
-                i.hash(&mut hasher);
-                hasher.finish()
-            })
-            .count();
-        println!("{} boards", count);
-    } else {
-        save_boards(
-            io_pairs,
-            SaveConfig::new(
-                NEURAL_INPUT_DIR,
-                NEURAL_OUTPUT_DIR,
-                BOARDS_PER_FILE,
-                AMOUNT_OF_FILES,
-                true,
-            ),
-        )?;
-    }
+    save_boards(io_pairs)?;
 
     Ok(())
 }

@@ -1,17 +1,12 @@
 use std::error::Error;
 
+use clap::ArgMatches;
 use csv::{ReaderBuilder, StringRecord};
 use shakmaty::{fen::Fen, uci::Uci, CastlingMode, Chess, Move, Position};
 
-use crate::{save_boards, SaveConfig};
+use crate::save_boards;
 
 const CSV_FILE: &str = "puzzles.csv";
-
-const NEURAL_INPUT_DIR: &str = "../npy_files/puzzle_input";
-const NEURAL_OUTPUT_DIR: &str = "../npy_files/puzzle_output";
-
-pub const BOARDS_PER_FILE: usize = 1_000_000;
-const AMOUNT_OF_FILES: usize = 14;
 
 #[derive(Debug, Clone)]
 struct Puzzle {
@@ -19,7 +14,7 @@ struct Puzzle {
     moves: Vec<Uci>,
 }
 
-pub fn main() -> Result<(), Box<dyn Error>> {
+pub fn main(_options: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let mut reader = ReaderBuilder::new()
         .flexible(true)
         .has_headers(false)
@@ -29,16 +24,7 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
     let io_pairs = puzzles_to_boards(puzzles);
 
-    save_boards(
-        io_pairs,
-        SaveConfig::new(
-            NEURAL_INPUT_DIR,
-            NEURAL_OUTPUT_DIR,
-            BOARDS_PER_FILE,
-            AMOUNT_OF_FILES,
-            true,
-        ),
-    )?;
+    save_boards( io_pairs)?;
 
     Ok(())
 }

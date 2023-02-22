@@ -1,26 +1,15 @@
 use std::{
-    collections::hash_map::DefaultHasher,
     error::Error,
-    hash::{Hash, Hasher},
     mem,
 };
 
+use clap::ArgMatches;
 use fs_err::File;
-use itertools::Itertools;
 use nom::{branch::alt, bytes::complete::tag, combinator::opt, number::complete::float};
 use pgn_reader::{BufferedReader, Skip, Visitor};
 use shakmaty::{Chess, Position};
 
-use crate::{eval_to_output, save_boards_outputs, SaveConfig};
-
-const PGN_FILE: &str = "database-2016-06.pgn";
-
-const NEURAL_INPUT_DIR: &str = "../npy_files/20M_evaluations_input";
-const NEURAL_OUTPUT_DIR: &str = "../npy_files/20M_evaluations_output";
-
-pub const AMOUNT_OF_BOARDS: usize = 20_000_000;
-pub const BOARDS_PER_FILE: usize = 500_000;
-pub const AMOUNT_OF_FILES: usize = AMOUNT_OF_BOARDS / BOARDS_PER_FILE;
+use crate::{eval_to_output, save_boards_outputs};
 
 struct NeuralInputCreator {
     board: Chess,
@@ -100,8 +89,9 @@ fn parse_checkmate(input: &[u8]) -> nom::IResult<&[u8], f32> {
     }
 }
 
-pub fn main() -> Result<(), Box<dyn Error>> {
-    let pgn = File::open(PGN_FILE)?;
+pub fn main(options: &ArgMatches) -> Result<(), Box<dyn Error>> {
+    let filename = options.get_one::<String>("pgn_file").expect("no pgn file");
+    let pgn = File::open(filename)?;
 
     let mut reader = BufferedReader::new(&pgn);
     let mut counter = NeuralInputCreator::default();
@@ -123,13 +113,6 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
     save_boards_outputs(
         io_pairs,
-        SaveConfig::new(
-            NEURAL_INPUT_DIR,
-            NEURAL_OUTPUT_DIR,
-            BOARDS_PER_FILE,
-            AMOUNT_OF_FILES,
-            false,
-        ),
     )?;
 
     Ok(())
