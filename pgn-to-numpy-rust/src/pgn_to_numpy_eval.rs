@@ -1,7 +1,4 @@
-use std::{
-    error::Error,
-    mem,
-};
+use std::{error::Error, mem};
 
 use clap::ArgMatches;
 use fs_err::File;
@@ -111,9 +108,7 @@ pub fn main(options: &ArgMatches) -> Result<(), Box<dyn Error>> {
     //         .count()
     // );
 
-    save_boards_outputs(
-        io_pairs,
-    )?;
+    save_boards_outputs(io_pairs)?;
 
     Ok(())
 }

@@ -67,18 +67,11 @@ pub fn eval_to_output(eval: f32) -> f32 {
     1.0 / (1.0 + (-eval).exp())
 }
 
-pub fn save_boards(
-    io_pairs: impl Iterator<Item = (Chess, Move)>,
-) -> io::Result<()> {
-    save_boards_outputs(
-        io_pairs
-            .map(|(input, output)| (input, move_to_output(&output))),
-        )
+pub fn save_boards(io_pairs: impl Iterator<Item = (Chess, Move)>) -> io::Result<()> {
+    save_boards_outputs(io_pairs.map(|(input, output)| (input, move_to_output(&output))))
 }
 
-pub fn save_boards_outputs<T>(
-    io_pairs: impl Iterator<Item = (Chess, T)>,
-) -> io::Result<()>
+pub fn save_boards_outputs<T>(io_pairs: impl Iterator<Item = (Chess, T)>) -> io::Result<()>
 where
     T: npyz::Serialize + npyz::AutoSerialize,
 {
@@ -88,16 +81,21 @@ where
         return Ok(());
     }
 
-    let neural_dir_prefix = ARGS.get_one::<String>("output").expect("No output directory specified");
+    let neural_dir_prefix = ARGS
+        .get_one::<String>("output")
+        .expect("No output directory specified");
     let neural_input_dir = &Path::new("../npy_files").join(neural_dir_prefix.clone() + "_input");
     let neural_output_dir = &Path::new("../npy_files").join(neural_dir_prefix.clone() + "_output");
 
-    let total_data = *ARGS.get_one::<usize>("total").expect("No total data specified");
-    let boards_per_file = *ARGS.get_one::<usize>("boards_per_file").expect("No boards per file specified");
+    let total_data = *ARGS
+        .get_one::<usize>("total")
+        .expect("No total data specified");
+    let boards_per_file = *ARGS
+        .get_one::<usize>("boards_per_file")
+        .expect("No boards per file specified");
     let amount_of_files = total_data / boards_per_file;
 
     assert!(total_data % boards_per_file == 0);
-
 
     if neural_input_dir.try_exists()? || neural_output_dir.try_exists()? {
         panic!("Directory already exists!");
@@ -132,8 +130,7 @@ where
                 .begin_nd()?
         };
 
-        let mut outputs =
-            File::create(neural_output_dir.join(format!("{chunk_index}.npy")))?;
+        let mut outputs = File::create(neural_output_dir.join(format!("{chunk_index}.npy")))?;
         let mut output_writer = {
             npyz::WriteOptions::new()
                 .default_dtype()

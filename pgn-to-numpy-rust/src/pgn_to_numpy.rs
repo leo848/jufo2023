@@ -1,8 +1,4 @@
-use std::{
-    error::Error,
-    fs::File,
-    mem,
-};
+use std::{error::Error, fs::File, mem};
 
 use clap::ArgMatches;
 use itertools::Itertools;
@@ -17,7 +13,6 @@ const ONLY_CHECKMATES: bool = true;
 const ONLY_OPENINGS: bool = false;
 const ONLY_MIDDLE_GAME: bool = false;
 const ONLY_ENDGAME: bool = true;
-
 
 #[derive(Debug, Clone)]
 struct NeuralInputCreator {
@@ -118,16 +113,14 @@ impl Visitor for NeuralInputCreator {
 }
 
 fn material_count(board: &Board) -> usize {
-        (board.knights() & board.bishops()).count() * 3
-            + board.queens().count() * 9
-            + board.rooks().count() * 5
-            + board.pawns().count()
+    (board.knights() & board.bishops()).count() * 3
+        + board.queens().count() * 9
+        + board.rooks().count() * 5
+        + board.pawns().count()
 }
 
 pub fn main(options: &ArgMatches) -> Result<(), Box<dyn Error>> {
-    let pgn = File::open(
-        options.get_one::<String>("pgn-file").expect("required")
-    )?;
+    let pgn = File::open(options.get_one::<String>("pgn-file").expect("required"))?;
 
     let mut reader = BufferedReader::new(&pgn);
     let mut counter = NeuralInputCreator::new();

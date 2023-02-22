@@ -24,7 +24,7 @@ pub fn main(_options: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     let io_pairs = puzzles_to_boards(puzzles);
 
-    save_boards( io_pairs)?;
+    save_boards(io_pairs)?;
 
     Ok(())
 }
