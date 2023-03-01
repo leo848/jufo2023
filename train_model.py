@@ -32,6 +32,9 @@ parser.add_argument(
     "--batch", type=int, help="The batch size to be used."
 )
 parser.add_argument(
+    "--epochs", type=int, help="The number of epochs to be used."
+)
+parser.add_argument(
     "--tensorboard", action="store_true", help="Whether to use tensorboard."
 )
 
@@ -61,8 +64,8 @@ VALIDATION_FILES = [ f"{i}.npy" for i in range(0, AMOUNT_OF_FILES) if (i + 7) % 
 assert len(TRAINING_FILES) + len(VALIDATION_FILES) == AMOUNT_OF_FILES
 assert len(set(TRAINING_FILES) & set(VALIDATION_FILES)) == 0
 
-BATCH_SIZE = args.batch
-EPOCHS = 128
+BATCH_SIZE = args.batch or 1024
+EPOCHS = args.epochs or 128
 
 TRAINING_STEPS = len(TRAINING_FILES) * DATA_PER_FILE // BATCH_SIZE // EPOCHS
 VALIDATION_STEPS = len(VALIDATION_FILES) * DATA_PER_FILE // BATCH_SIZE // EPOCHS

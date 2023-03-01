@@ -1,9 +1,9 @@
 <template>
   <v-app>
     <v-app-bar ref="app-bar" app floating>
-      <v-app-bar-title
-        >Wie kann Künstliche Intelligenz Schach lernen?</v-app-bar-title
-      >
+      <v-app-bar-title>
+        Wie kann Künstliche Intelligenz Schach lernen?
+      </v-app-bar-title>
       <v-spacer></v-spacer>
       <v-btn icon href="https://raw.githubusercontent.com/leo848/jufo2023/master/langfassung.pdf">
         <v-icon>mdi-file-document-multiple</v-icon>
