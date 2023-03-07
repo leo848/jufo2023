@@ -81,7 +81,7 @@ model.add(layers.Dense(1024, activation='relu'))
 model.add(layers.Dense(1024, activation='relu'))
 model.add(layers.Dense(1, activation='sigmoid'))
 
-model.compile(optimizer='adam', loss='mae', metrics=['mae'])
+model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 
 model.summary()
 
