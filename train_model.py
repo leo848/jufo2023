@@ -1,6 +1,8 @@
 import gc
 import os
 
+from typing import List
+
 import numpy as np
 import psutil
 
@@ -90,7 +92,7 @@ if TENSORBOARD:
         )
     )
 
-def generator_generator(files: list[str]):
+def generator_generator(files: List[str]):
     def generator():
         # for i in range(start, end):
         for file in files:
@@ -121,8 +123,6 @@ model.add(layers.Dense(4096, activation='softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 model.summary()
-
-input("Press enter to start training")
 
 # Train the model and display the training results
 history = model.fit(

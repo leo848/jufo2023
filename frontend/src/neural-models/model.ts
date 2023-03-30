@@ -30,6 +30,7 @@ export const playModelNames = [
   "12Mopenings",
   "14Mmiddlegame",
   "15Mendgame",
+  "schule-pc",
 ] as const;
 
 export type PlayModelName = typeof playModelNames[number];
@@ -68,6 +69,7 @@ export type Models = {
   "12Mopenings": Model<StandardPositionalInput, CompleteOutput>;
   "14Mmiddlegame": Model<StandardPositionalInput, CompleteOutput>;
   "15Mendgame": Model<StandardPositionalInput, CompleteOutput>;
+  "schule-pc": Model<StandardPositionalInput, CompleteOutput>;
 };
 
 export const defaultModel = "20mmatestrain-512neurons-4layers-2";

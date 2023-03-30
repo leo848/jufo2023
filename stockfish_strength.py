@@ -1,5 +1,7 @@
 import argparse
+import asyncio
 from os.path import expanduser
+import sys
 import chess
 import chess.engine
 import time
@@ -7,13 +9,20 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import models
 import io
+from typing import List
 
 parser = argparse.ArgumentParser(description='Test a model against Stockfish.')
 
 parser.add_argument('--stockfish', type=str, default=expanduser('~/.local/bin/stockfish'))
 parser.add_argument('--model', type=str, required=True)
+parser.add_argument('--vs', type=str, default="stockfish")
+parser.add_argument('--amount', type=int, default=400)
 
 args = parser.parse_args()
+
+if args.vs not in ['stockfish', 'random', 'model']:
+    print("USAGE: Must play against 'stockfish', 'random' or 'model'")
+    exit(1)
 
 model = models.load_model(args.model)
 # engine = chess.engine.SimpleEngine.popen_uci(args.stockfish)
@@ -23,7 +32,7 @@ model = models.load_model(args.model)
 # engine.configure({"UCI_LimitStrength": True, "UCI_Elo": 1350})
 # engine.configure({"Skill Level": 0})
 
-def model_play(boards: list[chess.Board]) -> chess.Move:
+def model_play(boards: List[chess.Board]) -> chess.Move:
     model_input = np.array([board_to_input(board) for board in boards])
     model_output = model.predict(model_input, verbose=0)
     return outputs_to_moves(model_output, boards)
@@ -35,7 +44,7 @@ def stockfish_play(board: chess.Board, engine: chess.engine.SimpleEngine) -> che
 def random_play(board: chess.Board) -> chess.Move:
     return np.random.choice(list(board.legal_moves))
 
-def board_to_input(board) -> list[float]:
+def board_to_input(board) -> List[float]:
     result = [float(board.turn)]
     for square in chess.SQUARES:
         piece = board.piece_at(square)
@@ -55,10 +64,10 @@ def board_to_input(board) -> list[float]:
     assert len(result) == (6 * 2 + 1) * 64 + 1
     return result
 
-def outputs_to_moves(noutputs: list[list[float]], boards: list[chess.Board]) -> list[chess.Move]:
+def outputs_to_moves(noutputs: List[List[float]], boards: List[chess.Board]) -> List[chess.Move]:
     return [ output_to_move(noutput, board) for (noutput, board) in zip(noutputs, boards) ]
 
-def output_to_move(noutput: list[float], board: chess.Board) -> chess.Move:
+def output_to_move(noutput: List[float], board: chess.Board) -> chess.Move:
     # return max(
     #     board.legal_moves,
     #     key=lambda move: noutput[move.from_square * 64 + move.to_square],
@@ -87,7 +96,10 @@ def output_to_move(noutput: list[float], board: chess.Board) -> chess.Move:
     # exception_string = f"Position: {board.fen()}, no legal move found (of {len(list(board.legal_moves))})."
     # raise Exception(exception_string)
 
-AMOUNT = 400
+AMOUNT = args.amount
+HEIGHT = 20
+
+assert AMOUNT % HEIGHT == 0
 
 def print_results(boards, move_no=None):
     """
@@ -106,8 +118,8 @@ def print_results(boards, move_no=None):
     else:
         print(file=f)
 
-    for i in range(0, 400, 20):
-        for j in range(20):
+    for i in range(0, AMOUNT, AMOUNT // HEIGHT):
+        for j in range(AMOUNT // HEIGHT):
             board = boards[i + j]
             if board.is_game_over():
                 if board.result() == "1-0":
@@ -121,7 +133,7 @@ def print_results(boards, move_no=None):
             print("██", end="", file=f)
         print("\033[0m", file=f)
 
-    print(f.getvalue(), end="")
+    print(f.getvalue(), end="", file=sys.stderr)
 
 def main():
     results = {
@@ -130,8 +142,9 @@ def main():
         "1/2-1/2": 0,
     }
 
-    engine = chess.engine.SimpleEngine.popen_uci(args.stockfish)
-    engine.configure({"Skill Level": 0})
+    if args.vs == "stockfish":
+        engine = chess.engine.SimpleEngine.popen_uci(args.stockfish)
+        engine.configure({"Skill Level": 1})
 
     boards = [ chess.Board() for _ in range(AMOUNT) ]
     filtered = boards
@@ -141,8 +154,16 @@ def main():
         if white_to_move:
             moves = model_play(filtered)
         else:
-            # moves = [ random_play(board) for board in filtered ]
-            moves = [ stockfish_play(board, engine) for board in filtered ]
+            if args.vs == "model":
+                moves = model_play(filtered)
+            elif args.vs == "random":
+                moves = [ random_play(board) for board in filtered ]
+            elif args.vs == "stockfish":
+                moves = [ stockfish_play(board, engine) for board in filtered ]
+            else:
+                print("USAGE: Invalid opponent")
+                exit(1)
+
         for (board, move) in zip(filtered, moves):
             board.push(move)
         filtered = [ board for board in filtered if not board.is_game_over() ]
@@ -164,7 +185,8 @@ def main():
     percentage = results["1-0"] / AMOUNT + results["1/2-1/2"] / AMOUNT / 2
     print(f"Percentage: {percentage}")
 
-    engine.quit()
+    if args.vs == "stockfish":
+        engine.quit()
 
 if __name__ == '__main__':
     main()
