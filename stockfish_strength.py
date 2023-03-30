@@ -69,7 +69,10 @@ def output_to_move(noutput: list[float], board: chess.Board) -> chess.Move:
 
     legal_moves = list(board.legal_moves)
     probabilities = np.array([ noutput[move.from_square * 64 + move.to_square] ** POW for move in board.legal_moves ])
+    one_hot_probs = np.zeros_like(probabilities)
+    one_hot_probs[np.argmax(probabilities)] = 1.
     probabilities /= np.sum(probabilities)
+    probabilities = 0.8 * one_hot_probs + 0.2 * probabilities
     return np.random.choice(legal_moves, p=probabilities)
 
 
