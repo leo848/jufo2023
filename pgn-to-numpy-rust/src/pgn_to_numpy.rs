@@ -12,7 +12,7 @@ const MIN_TIME: u32 = 300;
 const ONLY_CHECKMATES: bool = true;
 const ONLY_OPENINGS: bool = false;
 const ONLY_MIDDLE_GAME: bool = false;
-const ONLY_ENDGAME: bool = true;
+const ONLY_ENDGAME: bool = false;
 
 #[derive(Debug, Clone)]
 struct NeuralInputCreator {

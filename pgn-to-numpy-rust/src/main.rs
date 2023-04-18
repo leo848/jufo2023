@@ -30,6 +30,7 @@ fn cli() -> Command {
                 .long("dry-run")
                 .short('n')
                 .help("Only count the number of games that would be converted to .npy files")
+                .default_value(false)
                 .action(ArgAction::SetTrue),
         )
         .arg(
