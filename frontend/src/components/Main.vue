@@ -27,6 +27,9 @@
       <v-col cols="6" sm="4" lg="3" v-if="show.capturedPieces && !gameOver">
         <CapturedPieces :fen="fen" class="mt-2"/>
       </v-col>
+	  <v-dialog v-model="fenDialog">
+	  	<FenDialog @done="getNewFen" />
+	  </v-dialog>
     </v-row>
   </div>
 </template>
@@ -37,6 +40,7 @@ import GameOver from "@/components/GameOver.vue";
 import Continuation from "@/components/Continuation.vue";
 import Evaluation from "@/components/Evaluation.vue";
 import CapturedPieces from "@/components/CapturedPieces.vue";
+import FenDialog from "@/components/FenDialog.vue";
 
 import { loadPlayModel, type Model } from "@/neural-models/model";
 import type {
@@ -49,7 +53,7 @@ import {
   completeOutputToMoves,
   fenToStandardPositionalInput,
 } from "@/neural-models/chess_conversions";
-import { game, addEvent, removeEvent } from "@/chess/game";
+import { game, addEvent, removeEvent, setFen } from "@/chess/game";
 import { getMove } from "@/chess/boardHandlers";
 import { loadPiece } from "@/chess/loadPieces";
 
@@ -69,6 +73,7 @@ export default {
     Continuation,
     Evaluation,
     CapturedPieces,
+	FenDialog,
   },
   created() {
     loadPlayModel(loadSetting("playModelName"))
@@ -87,6 +92,7 @@ export default {
     show: loadSetting("show"),
     gameOver: false,
     fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+	fenDialog: false,
   }),
   mounted() {
     const config = {
@@ -146,6 +152,13 @@ export default {
     }
 
     document.head.appendChild(style);
+
+	document.addEventListener("keyup", e => {
+		if (e.key !== "f") return true;
+		else {
+			this.fenDialog = true;
+		}
+	})
   },
   beforeUnmount() {
     removeEvent(this.event);
@@ -208,6 +221,10 @@ export default {
         amount *= 10;
       }
 
+	// FIXME: sometimes makes moves at random.
+	// Reproducible FEN: "7R/p2p1pkp/1p1Pq1p1/4P3/7P/6Q1/P4P2/5RK1 w - - 1 32"
+	// (can be entered via pressing `f` during an active game)
+	// needs to fixed asap
       const currentColor = game.turn();
       if (
         !game.isGameOver() &&
@@ -312,6 +329,13 @@ export default {
         lastMove: undefined,
       });
     },
+
+	getNewFen(fen: string) {
+		console.log(fen);
+		this.fenDialog = false;
+		this.fen = fen;
+		setFen(fen);
+	}
   },
 };
 </script>

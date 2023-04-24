@@ -1,5 +1,6 @@
 use std::{
     collections::hash_map::DefaultHasher,
+    fmt::Debug,
     hash::{Hash, Hasher},
     io::{self, Write},
     path::Path,
@@ -74,12 +75,14 @@ pub fn save_boards(io_pairs: impl Iterator<Item = (Chess, Move)>) -> io::Result<
 pub fn save_boards_outputs<T>(io_pairs: impl Iterator<Item = (Chess, T)>) -> io::Result<()>
 where
     T: npyz::Serialize + npyz::AutoSerialize,
+    T: Debug,
 {
-    if ARGS.get_flag("dry-run") {
-        let count = io_pairs.count();
-        println!("{} games would be converted to .npy files", count);
-        return Ok(());
-    }
+    // if ARGS.get_flag("dry-run") {
+    //     let (count, last) = io_pairs.enumerate().last().expect("no input");
+    //     println!("{} games would be converted to .npy files", count);
+    //     println!("last is {:?}", last);
+    //     return Ok(());
+    // }
 
     let neural_dir_prefix = ARGS
         .get_one::<String>("output")

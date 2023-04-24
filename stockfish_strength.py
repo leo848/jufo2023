@@ -19,10 +19,14 @@ parser.add_argument('--vs', type=str, default="stockfish")
 parser.add_argument('--amount', type=int, default=400)
 
 args = parser.parse_args()
+opponent = None
 
 if args.vs not in ['stockfish', 'random', 'model']:
-    print("USAGE: Must play against 'stockfish', 'random' or 'model'")
-    exit(1)
+    try:
+        opponent = models.load_model(args.vs)
+    except IoError:
+        print("USAGE: Must play against 'stockfish', 'random' or 'model'")
+        exit(1)
 
 model = models.load_model(args.model)
 # engine = chess.engine.SimpleEngine.popen_uci(args.stockfish)
@@ -32,7 +36,7 @@ model = models.load_model(args.model)
 # engine.configure({"UCI_LimitStrength": True, "UCI_Elo": 1350})
 # engine.configure({"Skill Level": 0})
 
-def model_play(boards: List[chess.Board]) -> chess.Move:
+def model_play(boards: List[chess.Board], opponent=model) -> chess.Move:
     model_input = np.array([board_to_input(board) for board in boards])
     model_output = model.predict(model_input, verbose=0)
     return outputs_to_moves(model_output, boards)
@@ -160,6 +164,8 @@ def main():
                 moves = [ random_play(board) for board in filtered ]
             elif args.vs == "stockfish":
                 moves = [ stockfish_play(board, engine) for board in filtered ]
+            elif opponent:
+                moves = model_play(filtered, opponent=opponent)
             else:
                 print("USAGE: Invalid opponent")
                 exit(1)
@@ -183,7 +189,7 @@ def main():
         print(f"{result}: {count}")
 
     percentage = results["1-0"] / AMOUNT + results["1/2-1/2"] / AMOUNT / 2
-    print(f"Percentage: {percentage}")
+    print(f"Ergebnis: {percentage * 100.0}")
 
     if args.vs == "stockfish":
         engine.quit()

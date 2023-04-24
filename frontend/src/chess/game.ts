@@ -32,7 +32,10 @@ export function move(move: string | {from: string; to: string; promotion?: strin
 }
 
 export function setFen(fen: string) {
-  game.load(fen);
+  /* console.log(game.ascii()) */
+  /* console.log(fen); */
+  game = new Chess(fen);
+  /* console.log(game.ascii()) */
   for (const event of Object.values(events)) {
     event(game);
   }
