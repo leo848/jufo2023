@@ -33,6 +33,7 @@ export const playModelNames = [
   "schule-pc",
   "50M_first",
   "50M-1124neurons-2048batch",
+  "50M-2048neurons",
 ] as const;
 
 export type PlayModelName = typeof playModelNames[number];
@@ -74,6 +75,7 @@ export type Models = {
   "schule-pc": Model<StandardPositionalInput, CompleteOutput>;
   "50M_first": Model<StandardPositionalInput, CompleteOutput>;
   "50M-1124neurons-2048batch": Model<StandardPositionalInput, CompleteOutput>,
+  "50M-2048neurons": Model<StandardPositionalInput, CompleteOutput>,
 };
 
 export const defaultModel = "20mmatestrain-512neurons-4layers-2";
