@@ -234,6 +234,7 @@ export default {
         setTimeout(() => {
           let probs = this.assignProbabilities(moves);
           let move = this.chooseMove(probs);
+		  game.move(move);
           this.board!.move(move.from as Key, move.to as Key);
           this.update();
         }, 100);
@@ -276,7 +277,7 @@ export default {
       if (chosen == null) {
         return this.chooseMove(moves, tries-1);
       }
-      else if (game.move(chosen) == null) {
+      else if (getMove(chosen) == null) {
         return this.chooseMove(moves, tries-0.1);
       }
       return chosen;

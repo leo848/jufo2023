@@ -31,10 +31,10 @@ parser.add_argument(
     "--neurons", type=int, help="The number of neurons in each layer.", default=512
 )
 parser.add_argument(
-    "--batch", type=int, help="The batch size to be used."
+    "--batch", type=int, help="The batch size to be used.", default = 2048
 )
 parser.add_argument(
-    "--epochs", type=int, help="The number of epochs to be used."
+    "--epochs", type=int, help="The number of epochs to be used.", default = 32
 )
 parser.add_argument(
     "--tensorboard", action="store_true", help="Whether to use tensorboard."
