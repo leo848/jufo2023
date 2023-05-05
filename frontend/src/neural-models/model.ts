@@ -35,6 +35,7 @@ export const playModelNames = [
   "50M-1124neurons-2048batch",
   "50M-2048neurons",
   "50M-4096neurons",
+  "50M-8192neurons",
 ] as const;
 
 export type PlayModelName = typeof playModelNames[number];
@@ -78,23 +79,29 @@ export type Models = {
   "50M-1124neurons-2048batch": Model<StandardPositionalInput, CompleteOutput>,
   "50M-2048neurons": Model<StandardPositionalInput, CompleteOutput>,
   "50M-4096neurons": Model<StandardPositionalInput, CompleteOutput>,
+  "50M-8192neurons": Model<StandardPositionalInput, CompleteOutput>,
 };
 
 export const defaultModel = "20mmatestrain-512neurons-4layers-2";
 
-async function loadTfModel(name: string): Promise<LayersModel> {
-  return await tf.loadLayersModel(`models/${name}/model.json`);
+export type LoadOptions = {
+  onProgress?: (fraction: number) => void;
+};
+
+async function loadTfModel(name: string, options: LoadOptions): Promise<LayersModel> {
+  return await tf.loadLayersModel(`models/${name}/model.json`, options);
 }
 
 let models = {} as { [K in keyof Models]: Models[K] };
 
 export async function loadModel<K extends keyof Models>(
-  name: K
+  name: K,
+  options: LoadOptions = {}
 ): Promise<Models[K]> {
   if (models[name] != null) {
     return models[name];
   }
-  const model = await loadTfModel(name);
+  const model = await loadTfModel(name, options);
   let predict = (input: ModelInput<Models[K]>) => {
     const prediction = model.predict(tf.tensor(input, [1, 833])) as tf.Tensor;
     const output = prediction.dataSync() as ModelOutput<Models[K]>;
@@ -105,9 +112,10 @@ export async function loadModel<K extends keyof Models>(
 }
 
 export async function loadPlayModel(
-  name: PlayModelName
+  name: PlayModelName,
+  options: LoadOptions = {}
 ): Promise<Model<StandardPositionalInput, CompleteOutput>> {
-  return await loadModel(name);
+  return await loadModel(name, options);
 }
 
 export async function loadEvaluationModel(

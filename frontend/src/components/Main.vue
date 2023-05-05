@@ -14,7 +14,10 @@
           <v-card v-else max-width="300px">
             <v-card-title>Lade Modell...</v-card-title>
             <v-card-text>
-              <v-progress-circular :size="50" :width="6" indeterminate />
+              <v-progress-circular :size="50" :width="6" max="1" :model-value="modelLoadProgress * 100" :indeterminate="modelLoadProgress == undefined" />
+              <v-card v-if="modelLoadProgress">
+                <v-card-title>{{ Math.round(modelLoadProgress * 10000) / 100 }}%</v-card-title>
+              </v-card>
             </v-card-text>
           </v-card>
         </div>
@@ -76,7 +79,13 @@ export default {
 	FenDialog,
   },
   created() {
-    loadPlayModel(loadSetting("playModelName"))
+    loadPlayModel(loadSetting("playModelName"), {
+      onProgress: ((p: number) => {
+        console.log("Model load progress: " + p);
+        console.log(this.modelLoadProgress)
+        this.modelLoadProgress = p;
+      }).bind(this),
+    })
       .then((m) => (this.model = m))
       .then(this.update);
   },
@@ -84,6 +93,7 @@ export default {
     message: "Hello World!",
     event: 0,
     model: null as Model<StandardPositionalInput, CompleteOutput> | null,
+    modelLoadProgress: undefined as number | undefined,
     moves: [] as MoveWithAct[],
     legals: -1,
     board: null as Api | null,
