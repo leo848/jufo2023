@@ -27,6 +27,11 @@
           <Continuation :fen="fen" :key="fen"/>
         </div>
       </v-col>
+      <v-col cols="12" sm="4" lg="3" v-if="show.autoencode">
+        <div>
+          <Autoencoder :fen="fen"/>
+        </div>
+      </v-col>
       <v-col cols="6" sm="4" lg="3" v-if="show.capturedPieces && !gameOver">
         <CapturedPieces :fen="fen" class="mt-2"/>
       </v-col>
@@ -44,6 +49,7 @@ import Continuation from "@/components/Continuation.vue";
 import Evaluation from "@/components/Evaluation.vue";
 import CapturedPieces from "@/components/CapturedPieces.vue";
 import FenDialog from "@/components/FenDialog.vue";
+import Autoencoder from "@/components/Autoencoder.vue";
 
 import { loadPlayModel, type Model } from "@/neural-models/model";
 import type {
@@ -77,6 +83,7 @@ export default {
     Evaluation,
     CapturedPieces,
 	FenDialog,
+    Autoencoder,
   },
   created() {
     loadPlayModel(loadSetting("playModelName"), {
@@ -115,7 +122,7 @@ export default {
           if (this.gameOver) return;
           const move = getMove({ from: orig, to: dest });
           if (move) {
-            game.move(move);
+            try { game.move(move) } catch (e) {};
             this.update();
           }
           if (capturedPiece) {
@@ -216,6 +223,8 @@ export default {
       const output = this.model.predict(fenToStandardPositionalInput(input));
       let outputMoves = completeOutputToMoves(output);
 
+      console.log(outputMoves);
+
       const { maxMoves, onlyShowLegalMoves } = loadSettings();
 
       let amount = 500;
@@ -244,7 +253,7 @@ export default {
         setTimeout(() => {
           let probs = this.assignProbabilities(moves);
           let move = this.chooseMove(probs);
-		  game.move(move);
+          try { game.move(move) } catch (e) {};
           this.board!.move(move.from as Key, move.to as Key);
           this.update();
         }, 100);

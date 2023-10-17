@@ -1,3 +1,5 @@
+import type {Move} from "chess.js";
+
 // A standard positional input consists of 1 + (1 + 2 * 6) * 64 = 833 floats.
 // The first float is 1.0 if the side to move is white, and 0.0 if black.
 // The rest encodes the piece (or lack thereof) on each square.
@@ -6,9 +8,6 @@
 // The second one is 1.0 if the field is occupied by a white pawn, 0.0 else.
 // The third one is 1.0 if the field is occupied by a white knight, 0.0 else.
 // ...
-
-import type {Move} from "chess.js";
-
 // The twelfth one is 1.0 if the field is occupied by a black king, 0.0 else.
 export type StandardPositionalInput = Float32Array & { length: 833 } & {
   readonly __tag: unique symbol;

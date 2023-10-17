@@ -25,7 +25,8 @@ export const playModelNames = [
   "15mtrain-724neurons-4layers",
   "15mrevtrain-724neurons-4layers",
   "20mmatestrain-512neurons-4layers",
-  "20mmatestrain-512neurons-4layers-1024batch",
+  "20mmatestrain-512neurons-4layers-2",
+  // "20mmatestrain-512neurons-4layers-1024batch",
   "15mtrain-512neurons-4layers-1024batch",
   "12Mopenings",
   "14Mmiddlegame",
@@ -49,6 +50,13 @@ export const evaluationModelNames = [
 ] as const;
 
 export type EvaluationModelName = typeof evaluationModelNames[number];
+
+export const autoencoderModelNames = [
+  "first-autoencode",
+  "256-64-autoencoder",
+] as const;
+
+export type AutoencoderModelName = typeof autoencoderModelNames[number];
 
 // prettier-ignore
 export type Models = {
@@ -80,6 +88,8 @@ export type Models = {
   "50M-2048neurons": Model<StandardPositionalInput, CompleteOutput>,
   "50M-4096neurons": Model<StandardPositionalInput, CompleteOutput>,
   "50M-8192neurons": Model<StandardPositionalInput, CompleteOutput>,
+  "first-autoencode": Model<StandardPositionalInput, StandardPositionalInput>;
+  "256-64-autoencoder": Model<StandardPositionalInput, StandardPositionalInput>;
 };
 
 export const defaultModel = "20mmatestrain-512neurons-4layers-2";
@@ -121,5 +131,11 @@ export async function loadPlayModel(
 export async function loadEvaluationModel(
   name: EvaluationModelName
 ): Promise<Model<StandardPositionalInput, Evaluation>> {
+  return await loadModel(name);
+}
+
+export async function loadAutoencoderModel(
+  name: AutoencoderModelName
+): Promise<Model<StandardPositionalInput, StandardPositionalInput>> {
   return await loadModel(name);
 }

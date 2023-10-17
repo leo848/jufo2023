@@ -1,4 +1,4 @@
-import type {EvaluationModelName, PlayModelName} from "@/neural-models/model";
+import type {AutoencoderModelName, EvaluationModelName, PlayModelName} from "@/neural-models/model";
 import type { PieceTheme } from "../chess/loadPieces";
 
 type Settings = {
@@ -7,6 +7,7 @@ type Settings = {
   showActivation: boolean,
   show: {
     continuation: boolean,
+    autoencode: boolean,
     capturedPieces: boolean,
     neuralOutput: boolean,
     evaluation: boolean,
@@ -21,6 +22,7 @@ type Settings = {
   temperature: number,
   playModelName: PlayModelName,
   evaluationModelName: EvaluationModelName,
+  autoencoderModelName: AutoencoderModelName,
 }
 
 const _defaultSettings: Settings = {
@@ -33,6 +35,7 @@ const _defaultSettings: Settings = {
     white: false,
   },
   show: {
+    autoencode: false,
     continuation: false,
     capturedPieces: true,
     neuralOutput: true,
@@ -41,8 +44,9 @@ const _defaultSettings: Settings = {
   },
   orientation: "white",
   temperature: 0.5,
-  playModelName: "20mmatestrain-512neurons-4layers-1024batch",
+  playModelName: "50M_first",
   evaluationModelName: "20mevaltrain-1024neurons-4layers",
+  autoencoderModelName: "256-64-autoencoder"
 } as const;
 
 let settings: Settings = Object.assign({}, _defaultSettings, JSON.parse(localStorage.getItem("settings") || "{}"));

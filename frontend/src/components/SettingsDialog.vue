@@ -64,6 +64,7 @@
                 ['evaluation', 'evaluierung', 'Ein weiteres neuronales Netzwerk zeigt die aktuelle Bewertung des Spielfelds an.'],
                 ['continuation', 'fortsetzung', 'Wie würde das aktuell ausgewählte neuronale Netzwerk diese Partie für beide Seiten weiter spielen?'],
                 ['infoboxes', 'infofelder', 'Zeige überall verstreut ein paar Informationen an, so ähnlich wie diese hier.'],
+                ['autoencode', 'autoenkodierung', 'Zeige an, wie das Brett von einem neuronalen Netzwerk automatisch en- und wieder dekodiert wird.' ],
               ]"
               :key="element"
             >

@@ -14,7 +14,12 @@ export function getMove(input: string | {from: string; to: string; promotion?: s
       input.promotion = "q";
     }
   }
-  let move = game.move(input);
-  if (move != null) game.undo();
+  let move;
+  try {
+    move = game.move(input);
+    game.undo();
+  } catch (e) {
+    return null;
+  }
   return move;
 }

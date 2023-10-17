@@ -5,7 +5,9 @@ import type {
   CompleteOutput,
 } from "./types";
 
-import { Chess } from "chess.js";
+import { Chess, SQUARES, type Piece, type Square } from "chess.js";
+import { write } from "chessground/fen";
+import type {Key, Pieces} from "chessground/types";
 
 export function fenToStandardPositionalInput(
   fen: string
@@ -53,6 +55,38 @@ export function fenToStandardPositionalInput(
     );
   }
   return new Float32Array(input) as StandardPositionalInput;
+}
+
+function quantifyBoolean(input: number): boolean {
+  return input > 0.5;
+}
+
+export function standardPositionalInputToFen(input: StandardPositionalInput): string {
+  let field: Pieces = new Map();
+  let index = 0;
+  const turn = quantifyBoolean(input[index++]);
+  
+  for (const rank of ["1", "2", "3", "4", "5", "6", "7", "8"] as const) {
+    for (const file of ["a", "b", "c", "d", "e", "f", "g", "h"] as const) {
+      const square = file + rank;
+      const relevant = input.slice(index, index + 13);
+      let maxIndex = 0, max = -Infinity;
+      relevant.forEach((v, i) => { if (v > max) { max = v; maxIndex = i }});
+      if (maxIndex != 0) {
+        let pieceType = (maxIndex - 1) % 6, pieceColor = Math.floor((maxIndex - 1) / 6);
+        field.set(square as Square, {
+          role: (['pawn', 'knight', 'bishop', 'rook', 'queen', 'king'] as const)[pieceType],
+          color: (['white', 'black'] as const)[pieceColor],
+        })
+      }
+      index += 13;
+    }
+  }
+
+  console.log(field);
+  let cgFen = write(field);
+  // if (!turn) cgFen = cgFen.replace("w", "b");
+  return cgFen;
 }
 
 export function fromToOutputToMoves(

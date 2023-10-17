@@ -25,7 +25,7 @@ export function runEvent(id: number) {
 }
 
 export function move(move: string | {from: string; to: string; promotion?: string | undefined;}) {
-  game.move(move);
+  try { game.move(move) } catch (e) {};
   for (const event of Object.values(events)) {
     event(game);
   }

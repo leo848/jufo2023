@@ -52,7 +52,7 @@
           rounded="lg"
         >
           <div class="d-flex flex-row justify-space-between">
-            <div v-if="move.inner" v-html="prettyMove(move.inner)"></div>
+            <div v-if="move.inner && prettyMove(move.inner)" v-html="prettyMove(move.inner)"></div>
             <div v-else class="text-h5 pl-2 py-1">
               {{ move.from }} - {{ move.to }}
             </div>
@@ -81,6 +81,7 @@ import { loadSetting } from "@/settings/settings";
 import type { MoveWithAct } from "@/neural-models/types";
 
 import InfoBox from "@/components/InfoBox.vue";
+import {getMove} from "@/chess/boardHandlers";
 
 export default {
   name: "MoveDisplay",
@@ -120,6 +121,7 @@ export default {
     },
     prettyMove(move: Move): string {
       let san = move.san;
+      if (!san) return "";
       if (move.piece !== "p" && !san.startsWith("O")) san = san.slice(1);
       const imgSrc = loadPiece(move.color + move.piece.toUpperCase());
       return `
