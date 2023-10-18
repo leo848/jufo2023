@@ -6,7 +6,7 @@ import type {
 } from "./types";
 
 import { Chess, SQUARES, type Piece, type Square } from "chess.js";
-import { write } from "chessground/fen";
+import { read, write } from "chessground/fen";
 import type {Key, Pieces} from "chessground/types";
 
 export function fenToStandardPositionalInput(
@@ -83,10 +83,26 @@ export function standardPositionalInputToFen(input: StandardPositionalInput): st
     }
   }
 
-  console.log(field);
   let cgFen = write(field);
   // if (!turn) cgFen = cgFen.replace("w", "b");
   return cgFen;
+}
+
+export function fenDifference(left: string, right: string): number {
+  let piecesL = read(left), piecesR = read(right);
+  console.log(piecesL, piecesR)
+  let count = 0, totalError = 0;
+  for (const square of piecesL.keys()) {
+    console.log(square, count, totalError)
+    count += 1;
+    const g = (ps: Pieces) => ps.get(square as Key) || {} as Record<any, any>;
+    let pieceL = g(piecesL), pieceR = g(piecesR);
+    if (pieceL.color + pieceL.role != pieceR.color + pieceR.role) {
+      totalError += 1;
+    }
+  }
+  if (count == 0) count = 1;
+  return totalError / count;
 }
 
 export function fromToOutputToMoves(

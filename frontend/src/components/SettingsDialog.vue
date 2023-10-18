@@ -16,6 +16,15 @@
               v-model="settings.evaluationModelName"
               :items="evaluationModelNames"
               label="Modell zur Evaluierung"
+              v-if="settings.show.evaluation"
+            />
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-select
+              v-model="settings.autoencoderModelName"
+              :items="autoencoderModelNames"
+              label="Modell zum Autoenkodieren"
+              v-if="settings.show.autoencoder"
             />
           </v-col>
           <v-col cols="12">
@@ -64,7 +73,7 @@
                 ['evaluation', 'evaluierung', 'Ein weiteres neuronales Netzwerk zeigt die aktuelle Bewertung des Spielfelds an.'],
                 ['continuation', 'fortsetzung', 'Wie würde das aktuell ausgewählte neuronale Netzwerk diese Partie für beide Seiten weiter spielen?'],
                 ['infoboxes', 'infofelder', 'Zeige überall verstreut ein paar Informationen an, so ähnlich wie diese hier.'],
-                ['autoencode', 'autoenkodierung', 'Zeige an, wie das Brett von einem neuronalen Netzwerk automatisch en- und wieder dekodiert wird.' ],
+                ['autoencoder', 'autoenkodierung', 'Zeige an, wie das Brett von einem neuronalen Netzwerk automatisch en- und wieder dekodiert wird.' ],
               ]"
               :key="element"
             >
@@ -167,7 +176,7 @@
 
 <script lang="ts">
 import { loadSettings, defaultSettings, saveSettings } from "@/settings/settings";
-import { playModelNames, evaluationModelNames } from "@/neural-models/model";
+import { playModelNames, evaluationModelNames, autoencoderModelNames } from "@/neural-models/model";
 import {
   loadPiece,
   themes,
@@ -186,6 +195,7 @@ export default {
     pieceThemeMenu: false,
     playModelNames,
     evaluationModelNames,
+    autoencoderModelNames
   }),
   computed: {
     license() {

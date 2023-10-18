@@ -27,7 +27,7 @@
           <Continuation :fen="fen" :key="fen"/>
         </div>
       </v-col>
-      <v-col cols="12" sm="4" lg="3" v-if="show.autoencode">
+      <v-col cols="12" sm="4" lg="3" v-if="show.autoencoder">
         <div>
           <Autoencoder :fen="fen"/>
         </div>
@@ -88,8 +88,6 @@ export default {
   created() {
     loadPlayModel(loadSetting("playModelName"), {
       onProgress: ((p: number) => {
-        console.log("Model load progress: " + p);
-        console.log(this.modelLoadProgress)
         this.modelLoadProgress = p;
       }).bind(this),
     })
@@ -222,8 +220,6 @@ export default {
       const input = game.fen();
       const output = this.model.predict(fenToStandardPositionalInput(input));
       let outputMoves = completeOutputToMoves(output);
-
-      console.log(outputMoves);
 
       const { maxMoves, onlyShowLegalMoves } = loadSettings();
 

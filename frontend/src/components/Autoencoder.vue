@@ -1,6 +1,12 @@
 <template>
   <v-card>
-    <v-card-title>Autoenkodierung</v-card-title>
+    <v-card-title>
+      Autoenkodierung
+      <p class="text-body-2">
+        Ausgabegenauigkeit:
+        <PercentageDial :value="correctness" />
+      </p>
+    </v-card-title>
     <v-card-text>
       <div ref="boardauto" id="chessground-autoencoder"></div>
     </v-card-text>
@@ -8,19 +14,25 @@
 </template>
 
 <script lang="ts">
-import { standardPositionalInputToFen, fenToStandardPositionalInput } from '@/neural-models/chess_conversions';
+import { standardPositionalInputToFen, fenToStandardPositionalInput, fenDifference } from '@/neural-models/chess_conversions';
 import { type Model, loadAutoencoderModel } from '@/neural-models/model'
 import type { StandardPositionalInput as SpiType } from '@/neural-models/types';
 import { loadSetting } from '@/settings/settings';
 import type { Api as ChessgroundApi } from 'chessground/api';
 import { Chessground } from 'chessground';
 
+import PercentageDial from './PercentageDial.vue';
+
 export default {
   name: 'Autoencoder',
   data: () => ({
     model: null as Model<SpiType, SpiType> | null,
     cg: null as ChessgroundApi | null,
+    calculatedFen: null as string | null,
   }),
+  components: { 
+    PercentageDial,
+  },
   props: {
     fen: {
       type: String,
@@ -60,7 +72,14 @@ export default {
       const positionalInput = fenToStandardPositionalInput(this.fen);
       const position = this.model.predict(positionalInput);
       const decodedPosition = standardPositionalInputToFen(position);
-      this.cg!.set({ fen: decodedPosition });
+      this.calculatedFen = decodedPosition;
+      this.cg!.set({ fen: this.calculatedFen });
+    }
+  },
+  computed: {
+    correctness() {
+      if (this.fen == null || this.calculatedFen == null) return 1.0;
+      return 1.0 - fenDifference(this.fen, this.calculatedFen);
     }
   }
 }

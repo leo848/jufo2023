@@ -7,7 +7,7 @@ type Settings = {
   showActivation: boolean,
   show: {
     continuation: boolean,
-    autoencode: boolean,
+    autoencoder: boolean,
     capturedPieces: boolean,
     neuralOutput: boolean,
     evaluation: boolean,
@@ -35,7 +35,7 @@ const _defaultSettings: Settings = {
     white: false,
   },
   show: {
-    autoencode: false,
+    autoencoder: false,
     continuation: false,
     capturedPieces: true,
     neuralOutput: true,

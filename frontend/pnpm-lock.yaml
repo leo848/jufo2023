@@ -26,6 +26,9 @@ dependencies:
   roboto-fontface:
     specifier: ^0.10.0
     version: 0.10.0
+  ts-toolbelt:
+    specifier: ^9.6.0
+    version: 9.6.0
   vue:
     specifier: ^3.3.4
     version: 3.3.4
@@ -2950,6 +2953,10 @@ packages:
 
   /tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
+    dev: false
+
+  /ts-toolbelt@9.6.0:
+    resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
     dev: false
 
   /tslib@1.14.1:

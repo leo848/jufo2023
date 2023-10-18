@@ -9,27 +9,12 @@
           :icon="movesShown ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
           @click="showAll"
           @blur="movesShown && showAll"
-          :color="movesShown ? 'white' : null"
+          :color="movesShown ? 'white' : undefined"
           variant="plain"
           class="mb-0"
         />
         Legale Ausgaben:
-        <v-tooltip right :open-on-click="true">
-          <p class="text-h4">
-            {{ displayLegals }}
-          </p>
-          <template v-slot:activator="{ props }">
-            <v-progress-circular
-              :model-value="legals * 100"
-              color="green"
-              bg-color="red"
-              width="8"
-              size="large"
-              class="ml-4"
-              v-bind="props"
-            />
-          </template>
-        </v-tooltip>
+        <PercentageDial :value="legals" /> 
         <InfoBox class="ml-2" name="legal-outputs" :templates="{ percentage: (legals * 100).toFixed(2) }" />
       </p>
     </v-col>
@@ -81,12 +66,13 @@ import { loadSetting } from "@/settings/settings";
 import type { MoveWithAct } from "@/neural-models/types";
 
 import InfoBox from "@/components/InfoBox.vue";
-import {getMove} from "@/chess/boardHandlers";
+import PercentageDial from "@/components/PercentageDial.vue";
 
 export default {
   name: "MoveDisplay",
   components: {
     InfoBox,
+    PercentageDial
   },
   data: () => ({
     gray: "grey lighten-3",
@@ -104,14 +90,6 @@ export default {
       }
       return moves.slice(0, maxMoves);
     },
-    displayLegals() {
-      const numberFormat = new Intl.NumberFormat(undefined, {
-        style: "percent",
-        maximumFractionDigits: 2,
-        minimumFractionDigits: 2,
-      });
-      return numberFormat.format(this.legals);
-    }
   },
   methods: {
     interpolate: (t: number) => (x: number) =>
