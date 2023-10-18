@@ -5,6 +5,14 @@
       <p class="text-body-2">
         Ausgabegenauigkeit:
         <PercentageDial :value="correctness" />
+        <v-btn
+          :icon="deltasShown ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+          @click="showDeltas"
+          @blur="deltasShown && showDeltas"
+          :color="deltasShown ? 'white' : undefined"
+          variant="plain"
+          class="mb-0"
+        />
       </p>
     </v-card-title>
     <v-card-text>
@@ -33,6 +41,7 @@ export default {
     cg: null as ChessgroundApi | null,
     calculatedFen: null as string | null,
     show: loadSetting("show"),
+    deltasShown: false,
   }),
   components: { 
     PercentageDial,
@@ -79,13 +88,22 @@ export default {
       const decodedPosition = standardPositionalInputToFen(position);
       this.calculatedFen = decodedPosition;
       this.cg!.set({ fen: this.calculatedFen });
+      this.showDeltas();
+      
+    },
+    showDeltas() {
+      if (this.deltasShown) {
+        this.deltasShown = false;
+        this.cg!.setShapes([]);
+        return;
+      }
+      this.deltasShown = true;
       let pieces = read(this.fen);
       this.cg!.setShapes(this.fenDifference.deltas.map(sq => ({
         orig: sq,
         brush: "red",
         piece: pieces.get(sq),
-      })
-      ));
+      })));
     }
   },
   computed: {
