@@ -9,6 +9,7 @@
     </v-card-title>
     <v-card-text>
       <div ref="boardauto" id="chessground-autoencoder"></div>
+      <Evaluation :fen="calculatedFen + ' w KQkq - 0 1'" class="mt-4" v-if="calculatedFen && show.evaluation" />
     </v-card-text>
   </v-card>
 </template>
@@ -20,8 +21,10 @@ import type { StandardPositionalInput as SpiType } from '@/neural-models/types';
 import { loadSetting } from '@/settings/settings';
 import type { Api as ChessgroundApi } from 'chessground/api';
 import { Chessground } from 'chessground';
+import {read} from 'chessground/fen';
 
 import PercentageDial from './PercentageDial.vue';
+import Evaluation from './Evaluation.vue';
 
 export default {
   name: 'Autoencoder',
@@ -29,9 +32,11 @@ export default {
     model: null as Model<SpiType, SpiType> | null,
     cg: null as ChessgroundApi | null,
     calculatedFen: null as string | null,
+    show: loadSetting("show"),
   }),
   components: { 
     PercentageDial,
+    Evaluation,
   },
   props: {
     fen: {
@@ -74,12 +79,22 @@ export default {
       const decodedPosition = standardPositionalInputToFen(position);
       this.calculatedFen = decodedPosition;
       this.cg!.set({ fen: this.calculatedFen });
+      let pieces = read(this.fen);
+      this.cg!.setShapes(this.fenDifference.deltas.map(sq => ({
+        orig: sq,
+        brush: "red",
+        piece: pieces.get(sq),
+      })
+      ));
     }
   },
   computed: {
+    fenDifference() {
+      if (this.fen == null || this.calculatedFen == null) return { ratio: 0.0, deltas: [] };
+      return fenDifference(this.fen, this.calculatedFen);
+    },
     correctness() {
-      if (this.fen == null || this.calculatedFen == null) return 1.0;
-      return 1.0 - fenDifference(this.fen, this.calculatedFen);
+      return 1.0 - this.fenDifference.ratio;
     }
   }
 }

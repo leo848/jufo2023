@@ -88,21 +88,23 @@ export function standardPositionalInputToFen(input: StandardPositionalInput): st
   return cgFen;
 }
 
-export function fenDifference(left: string, right: string): number {
+export function fenDifference(left: string, right: string): { ratio: number, deltas: Square[] } {
   let piecesL = read(left), piecesR = read(right);
-  console.log(piecesL, piecesR)
+  let errors: Square[] = [];
   let count = 0, totalError = 0;
-  for (const square of piecesL.keys()) {
-    console.log(square, count, totalError)
-    count += 1;
+  for (const square of SQUARES) {
+    if (piecesL.get(square) || piecesR.get(square)) {
+      count += 1;
+    } else continue;
     const g = (ps: Pieces) => ps.get(square as Key) || {} as Record<any, any>;
     let pieceL = g(piecesL), pieceR = g(piecesR);
     if (pieceL.color + pieceL.role != pieceR.color + pieceR.role) {
+      errors.push(square);
       totalError += 1;
     }
   }
   if (count == 0) count = 1;
-  return totalError / count;
+  return { ratio: totalError / count, deltas: errors };
 }
 
 export function fromToOutputToMoves(
