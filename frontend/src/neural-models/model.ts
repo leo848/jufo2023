@@ -57,6 +57,7 @@ export const autoencoderModelNames = [
   "256-64-autoencoder",
   "256-128-autoencoder",
   "128-shallow-autoencoder",
+  "256-shallow-autoencoder",
 ] as const;
 
 export type AutoencoderModelName = typeof autoencoderModelNames[number];

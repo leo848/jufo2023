@@ -1,16 +1,17 @@
 <template>
   <v-tooltip location="bottom">
-    <p class="text-h4">{{ display(evaluation) }}</p>
+    <p class="text-h4">{{ error ? error : display(evaluation) }}</p>
     <template v-slot:activator="{ props }">
       <v-progress-linear
         v-model="displayEvaluation"
         :max="1.0"
         :min="0.0"
-        color="white"
-        background-color="black"
+        :color="error ? 'red' : 'white'"
+        :background-color="error ? '#ddd' : 'black'"
         :reverse="blackLeft"
         height="20"
         :indeterminate="model === null"
+        :striped="!!error"
         class="rounded-xl mt-4"
         v-bind="props"
         >
@@ -31,6 +32,7 @@ export default {
     model: null as Model<StandardPositionalInput, Evaluation> | null,
     evaluation: 0.5,
     blackLeft: loadSetting("orientation") === "black",
+    error: null as null | string,
   }),
   props: {
     fen: {
@@ -62,7 +64,14 @@ export default {
       if (!this.model) {
         return;
       }
-      const positionalInput = fenToStandardPositionalInput(this.fen);
+      this.error = null;
+      let positionalInput;
+      try {
+        positionalInput = fenToStandardPositionalInput(this.fen); // TODO: make this not use chess.js to allow invalid
+      } catch(e) {
+        this.error = e + "";
+        return;
+      }
       const evaluation = this.model.predict(positionalInput);
       this.evaluation = evaluationOutputToEvaluation(evaluation);
     },

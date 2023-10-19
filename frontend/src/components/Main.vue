@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-row>
+    <v-row class="main-grid">
       <v-col cols="12" sm="8" md="6" lg="4">
         <div ref="board" id="chessground-main"></div>
         <Evaluation :fen="fen" v-if="show.evaluation && !gameOver" class="mt-4"/>
@@ -391,5 +391,9 @@ export default {
 
 cg-board {
   background-color: #bfcfdd;
+}
+
+.main-grid {
+  transition: all 0.5s ease;
 }
 </style>
